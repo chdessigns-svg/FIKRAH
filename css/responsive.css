@@ -137,6 +137,10 @@
   .footer-grid {
     grid-template-columns: 1fr 1fr;
   }
+
+  .blog-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 @media (max-width: 650px) {
@@ -308,6 +312,10 @@
   .footer-grid {
     grid-template-columns: 1fr;
     gap: 35px;
+  }
+
+  .blog-grid {
+    grid-template-columns: 1fr;
   }
 
   .footer-bottom {
