@@ -15,6 +15,15 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
+  // If videos are added/edited in the admin panel in another tab on this
+  // same browser, refresh this page so the change shows up without
+  // needing a manual reload.
+  window.addEventListener("storage", event => {
+    if (event.key === CMS.KEYS.videos) {
+      location.reload();
+    }
+  });
+
   function cardHTML(video) {
     const id = video.youtubeId || CMS.extractYouTubeId(video.url || "");
     if (!id) return "";

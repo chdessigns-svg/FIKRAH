@@ -189,15 +189,16 @@
       event.preventDefault();
 
       const data = Object.fromEntries(new FormData(modalForm).entries());
+      let saved = false;
 
       if (currentType === "post") {
-        currentId ? CMS.updatePost(currentId, data) : CMS.addPost(data);
+        saved = currentId ? CMS.updatePost(currentId, data) : CMS.addPost(data);
       }
 
       if (currentType === "gallery") {
         data.category = data.galleryCategory;
         delete data.galleryCategory;
-        currentId ? CMS.updateImage(currentId, data) : CMS.addImage(data);
+        saved = currentId ? CMS.updateImage(currentId, data) : CMS.addImage(data);
       }
 
       if (currentType === "video") {
@@ -209,7 +210,12 @@
         }
 
         const video = { title: data.title, category: data.videoCategory, youtubeId };
-        currentId ? CMS.updateVideo(currentId, video) : CMS.addVideo(video);
+        saved = currentId ? CMS.updateVideo(currentId, video) : CMS.addVideo(video);
+      }
+
+      if (!saved) {
+        alert("Couldn't save this — this browser's storage is full (likely from earlier photo uploads). Try removing an old photo, or compress it before uploading, then try again.");
+        return;
       }
 
       closeModal();

@@ -157,19 +157,20 @@
     addPost(post) {
       const list = read(KEYS.posts, DEFAULT_POSTS);
       list.unshift(Object.assign({ id: uid("post") }, post));
-      write(KEYS.posts, list);
+      return write(KEYS.posts, list);
     },
     updatePost(id, patch) {
       const list = read(KEYS.posts, DEFAULT_POSTS);
       const idx = list.findIndex(p => p.id === id);
       if (idx > -1) {
         list[idx] = Object.assign({}, list[idx], patch);
-        write(KEYS.posts, list);
+        return write(KEYS.posts, list);
       }
+      return false;
     },
     deletePost(id) {
       const list = read(KEYS.posts, DEFAULT_POSTS).filter(p => p.id !== id);
-      write(KEYS.posts, list);
+      return write(KEYS.posts, list);
     },
 
     getGallery() {
@@ -181,19 +182,20 @@
     addImage(item) {
       const list = read(KEYS.gallery, DEFAULT_GALLERY);
       list.unshift(Object.assign({ id: uid("img") }, item));
-      write(KEYS.gallery, list);
+      return write(KEYS.gallery, list);
     },
     updateImage(id, patch) {
       const list = read(KEYS.gallery, DEFAULT_GALLERY);
       const idx = list.findIndex(g => g.id === id);
       if (idx > -1) {
         list[idx] = Object.assign({}, list[idx], patch);
-        write(KEYS.gallery, list);
+        return write(KEYS.gallery, list);
       }
+      return false;
     },
     deleteImage(id) {
       const list = read(KEYS.gallery, DEFAULT_GALLERY).filter(g => g.id !== id);
-      write(KEYS.gallery, list);
+      return write(KEYS.gallery, list);
     },
 
     getVideos() {
@@ -205,19 +207,20 @@
     addVideo(video) {
       const list = read(KEYS.videos, DEFAULT_VIDEOS);
       list.unshift(Object.assign({ id: uid("vid") }, video));
-      write(KEYS.videos, list);
+      return write(KEYS.videos, list);
     },
     updateVideo(id, patch) {
       const list = read(KEYS.videos, DEFAULT_VIDEOS);
       const idx = list.findIndex(v => v.id === id);
       if (idx > -1) {
         list[idx] = Object.assign({}, list[idx], patch);
-        write(KEYS.videos, list);
+        return write(KEYS.videos, list);
       }
+      return false;
     },
     deleteVideo(id) {
       const list = read(KEYS.videos, DEFAULT_VIDEOS).filter(v => v.id !== id);
-      write(KEYS.videos, list);
+      return write(KEYS.videos, list);
     },
 
     // Accepts a full YouTube URL (watch, youtu.be, shorts or embed) or a
