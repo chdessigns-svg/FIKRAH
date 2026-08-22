@@ -5,8 +5,9 @@
 
    Videos render as a thumbnail with a play button (no iframe
    loaded yet). The real YouTube embed is only inserted once
-   someone clicks play, so the page stays fast and only talks
-   to YouTube when a visitor actually chooses to watch.
+   someone clicks play (see the click-to-play handler in
+   cms.js), so the page stays fast and only talks to YouTube
+   when a visitor actually chooses to watch.
    ========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -24,38 +25,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  function cardHTML(video) {
-    const id = video.youtubeId || CMS.extractYouTubeId(video.url || "");
-    if (!id) return "";
-
-    return `
-      <article class="video-card reveal" data-youtube-id="${id}">
-        <div class="video-thumb" style="background-image:url('${CMS.youtubeThumb(id)}')">
-          <button class="video-play" type="button" aria-label="Play video">▶</button>
-        </div>
-        <div class="video-card-body">
-          <strong>${Fikrah.escapeHTML(video.title || "Untitled video")}</strong>
-          ${video.category ? `<span class="video-tag">${Fikrah.escapeHTML(video.category)}</span>` : ""}
-        </div>
-      </article>
-    `;
-  }
-
-  function play(card) {
-    const id = card.dataset.youtubeId;
-    const thumb = card.querySelector(".video-thumb");
-    thumb.innerHTML = `<iframe src="${CMS.youtubeEmbedUrl(id)}" title="YouTube video player" frameborder="0"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
-    card.classList.add("is-playing");
-  }
-
-  document.addEventListener("click", event => {
-    const btn = event.target.closest(".video-play");
-    if (!btn) return;
-    play(btn.closest(".video-card"));
-  });
-
   /* -------------------------------------------------------
      FULL VIDEOS PAGE (pages/videos.html)
      ------------------------------------------------------- */
@@ -70,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function render(list) {
       grid.innerHTML = list.length
-        ? list.map(cardHTML).join("")
+        ? list.map(v => CMS.videoCardHTML(v)).join("")
         : '<div class="member-empty" style="display:block;">No videos yet — add some from the content manager.</div>';
     }
 
@@ -104,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (teaser) {
     const items = CMS.getVideos().slice(0, 3);
     teaser.innerHTML = items.length
-      ? items.map(cardHTML).join("")
+      ? items.map(v => CMS.videoCardHTML(v)).join("")
       : '<div class="member-empty" style="display:block;">No videos yet.</div>';
   }
 

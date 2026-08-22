@@ -326,6 +326,15 @@
     grid-template-columns: 1fr;
   }
 
+  .post-media-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .post-media-grid .video-thumb {
+    aspect-ratio: 16 / 9;
+    height: auto;
+  }
+
   .footer-bottom {
     flex-direction: column;
   }

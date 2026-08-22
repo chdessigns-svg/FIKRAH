@@ -33,11 +33,27 @@ document.addEventListener("DOMContentLoaded", () => {
     .map(p => `<p>${Fikrah.escapeHTML(p).replace(/\n/g, "<br>")}</p>`)
     .join("");
 
-  const cover = post.image
-    ? `<div class="cms-cover post-cover" style="background-image:url('${post.image}')"></div>`
-    : `<div class="cms-cover post-cover g-variant-${(post.title || "F").charCodeAt(0) % CMS.GRADIENT_VARIANTS}">
+  const imageBlock = post.image
+    ? `<div class="cms-cover" style="background-image:url('${post.image}')"></div>`
+    : "";
+
+  const videoBlock = post.videoId ? CMS.youtubeFacadeHTML(post.videoId) : "";
+
+  let cover;
+
+  if (imageBlock && videoBlock) {
+    // Both a cover photo and a video — show them side by side, matching
+    // how session recaps pair a photo with the talk's recording.
+    cover = `<div class="post-media-grid">${imageBlock}${videoBlock}</div>`;
+  } else if (videoBlock) {
+    cover = `<div class="post-video-cover">${videoBlock}</div>`;
+  } else if (imageBlock) {
+    cover = imageBlock.replace('class="cms-cover"', 'class="cms-cover post-cover"');
+  } else {
+    cover = `<div class="cms-cover post-cover g-variant-${(post.title || "F").charCodeAt(0) % CMS.GRADIENT_VARIANTS}">
          <span class="cms-cover-letter">${Fikrah.escapeHTML((post.title || "F").charAt(0))}</span>
        </div>`;
+  }
 
   mount.innerHTML = `
     <div class="breadcrumb">

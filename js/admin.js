@@ -160,6 +160,7 @@
             if (type === "gallery" && key === "category") fieldName = "galleryCategory";
             if (type === "video" && key === "category") fieldName = "videoCategory";
             if (type === "video" && key === "youtubeId") fieldName = "videoUrl";
+            if (type === "post" && key === "videoId") fieldName = "postVideoUrl";
 
             const field = modalForm.elements[fieldName];
             if (field) field.value = record[key];
@@ -192,6 +193,20 @@
       let saved = false;
 
       if (currentType === "post") {
+        if (data.postVideoUrl) {
+          const videoId = CMS.extractYouTubeId(data.postVideoUrl);
+
+          if (!videoId) {
+            alert("That video link doesn't look right — check it and try again, or leave the video field blank.");
+            return;
+          }
+
+          data.videoId = videoId;
+        } else {
+          data.videoId = "";
+        }
+        delete data.postVideoUrl;
+
         saved = currentId ? CMS.updatePost(currentId, data) : CMS.addPost(data);
       }
 

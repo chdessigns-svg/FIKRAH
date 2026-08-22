@@ -253,6 +253,31 @@
       return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
     },
 
+    // A bare click-to-play thumbnail for a YouTube video — usable on its
+    // own (e.g. inline in a blog post) or wrapped in a bigger card.
+    youtubeFacadeHTML(id) {
+      return `
+        <div class="video-thumb" data-youtube-id="${id}" style="background-image:url('${this.youtubeThumb(id)}')">
+          <button class="video-play" type="button" aria-label="Play video">▶</button>
+        </div>
+      `;
+    },
+    // The full card used on the Videos page/teaser: facade + title/tag.
+    videoCardHTML(video) {
+      const id = video.youtubeId || this.extractYouTubeId(video.url || "");
+      if (!id) return "";
+
+      return `
+        <article class="video-card reveal">
+          ${this.youtubeFacadeHTML(id)}
+          <div class="video-card-body">
+            <strong>${global.Fikrah.escapeHTML(video.title || "Untitled video")}</strong>
+            ${video.category ? `<span class="video-tag">${global.Fikrah.escapeHTML(video.category)}</span>` : ""}
+          </div>
+        </article>
+      `;
+    },
+
     resetAll() {
       write(KEYS.posts, DEFAULT_POSTS);
       write(KEYS.gallery, DEFAULT_GALLERY);
@@ -320,5 +345,27 @@
       global.showToast(message);
     }
   };
+
+  /* -------------------------------------------------------
+     YOUTUBE CLICK-TO-PLAY
+     Delegated globally so any page that renders a
+     .video-thumb (Videos page, homepage teaser, inline in a
+     blog post) gets play-on-click for free.
+     ------------------------------------------------------- */
+
+  document.addEventListener("click", event => {
+    const btn = event.target.closest(".video-play");
+    if (!btn) return;
+
+    const thumb = btn.closest(".video-thumb");
+    if (!thumb) return;
+
+    const id = thumb.dataset.youtubeId;
+
+    thumb.innerHTML = `<iframe src="${CMS.youtubeEmbedUrl(id)}" title="YouTube video player" frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
+    thumb.classList.add("is-playing");
+  });
 
 })(window);
