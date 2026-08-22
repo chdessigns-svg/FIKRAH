@@ -72,6 +72,7 @@
         <div class="admin-tabs">
           <button class="admin-tab active" data-tab="posts">Blog Posts &amp; Slider</button>
           <button class="admin-tab" data-tab="gallery">Gallery</button>
+          <button class="admin-tab" data-tab="videos">Videos</button>
         </div>
 
         <!-- POSTS PANEL -->
@@ -113,6 +114,30 @@
                 <tr><th>Image</th><th>Category</th><th>Photo</th><th>Actions</th></tr>
               </thead>
               <tbody id="galleryTable"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- VIDEOS PANEL -->
+        <section class="admin-panel" id="panel-videos">
+          <div class="admin-toolbar">
+            <div>
+              <h2>Videos</h2>
+              <p style="color: var(--gray-500); font-size: 0.8rem; margin-top: 4px;">
+                Paste a YouTube link (or just the video ID) to embed it on the Videos page and homepage.
+              </p>
+            </div>
+            <div class="admin-actions">
+              <button class="admin-btn primary" data-add="video">+ Add Video</button>
+            </div>
+          </div>
+
+          <div class="admin-card">
+            <table class="admin-table">
+              <thead>
+                <tr><th>Video</th><th>Category</th><th>YouTube</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="videosTable"></tbody>
             </table>
           </div>
         </section>
@@ -163,7 +188,7 @@
       <form id="entryForm">
 
         <!-- SHARED: TITLE -->
-        <div data-field-for="post" class="form-group">
+        <div data-field-for="post,video" class="form-group">
           <label for="f-title">Title</label>
           <input class="form-control" id="f-title" name="title" type="text" required />
         </div>
@@ -209,6 +234,20 @@
         <div data-field-for="gallery" class="form-group">
           <label for="f-galleryCategory">Category</label>
           <input class="form-control" id="f-galleryCategory" name="galleryCategory" type="text" placeholder="e.g. Sessions, Speakers, Community" />
+        </div>
+
+        <!-- VIDEO FIELDS -->
+        <div data-field-for="video" class="form-group">
+          <label for="f-videoUrl">YouTube Link or Video ID</label>
+          <input class="form-control" id="f-videoUrl" name="videoUrl" type="text" placeholder="https://www.youtube.com/watch?v=..." />
+          <p style="color: var(--gray-500); font-size: 0.72rem; margin-top: 6px;">
+            Paste the full YouTube URL (watch, youtu.be or shorts link works) or just the 11-character video ID.
+          </p>
+        </div>
+
+        <div data-field-for="video" class="form-group">
+          <label for="f-videoCategory">Category</label>
+          <input class="form-control" id="f-videoCategory" name="videoCategory" type="text" placeholder="e.g. Sessions, Speakers, Community" />
         </div>
 
         <!-- SHARED: PHOTO UPLOAD -->

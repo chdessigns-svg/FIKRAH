@@ -21,6 +21,7 @@
   const KEYS = {
     posts: "fikrah_cms_posts",
     gallery: "fikrah_cms_gallery",
+    videos: "fikrah_cms_videos",
   };
 
   const GRADIENT_VARIANTS = 5;
@@ -111,9 +112,19 @@
     { id: "g9", caption: "Group photo", small: "Closing", category: "Community", image: "" },
   ];
 
+  const DEFAULT_VIDEOS = [
+    {
+      id: "v1",
+      title: "Fikrah Summit — Session Highlights",
+      youtubeId: "58vNS3C0Jds",
+      category: "Sessions",
+    },
+  ];
+
   function seedIfEmpty() {
     if (!localStorage.getItem(KEYS.posts)) write(KEYS.posts, DEFAULT_POSTS);
     if (!localStorage.getItem(KEYS.gallery)) write(KEYS.gallery, DEFAULT_GALLERY);
+    if (!localStorage.getItem(KEYS.videos)) write(KEYS.videos, DEFAULT_VIDEOS);
   }
 
   seedIfEmpty();
@@ -185,9 +196,64 @@
       write(KEYS.gallery, list);
     },
 
+    getVideos() {
+      return read(KEYS.videos, DEFAULT_VIDEOS);
+    },
+    saveVideos(list) {
+      return write(KEYS.videos, list);
+    },
+    addVideo(video) {
+      const list = read(KEYS.videos, DEFAULT_VIDEOS);
+      list.unshift(Object.assign({ id: uid("vid") }, video));
+      write(KEYS.videos, list);
+    },
+    updateVideo(id, patch) {
+      const list = read(KEYS.videos, DEFAULT_VIDEOS);
+      const idx = list.findIndex(v => v.id === id);
+      if (idx > -1) {
+        list[idx] = Object.assign({}, list[idx], patch);
+        write(KEYS.videos, list);
+      }
+    },
+    deleteVideo(id) {
+      const list = read(KEYS.videos, DEFAULT_VIDEOS).filter(v => v.id !== id);
+      write(KEYS.videos, list);
+    },
+
+    // Accepts a full YouTube URL (watch, youtu.be, shorts or embed) or a
+    // bare 11-character video ID, and returns just the ID (or "" if the
+    // input doesn't look like a YouTube video at all).
+    extractYouTubeId(input) {
+      const value = (input || "").trim();
+      if (/^[\w-]{11}$/.test(value)) return value;
+
+      try {
+        const url = new URL(value);
+        if (url.hostname === "youtu.be") {
+          return url.pathname.slice(1, 12);
+        }
+        if (url.hostname.includes("youtube.com")) {
+          if (url.searchParams.get("v")) return url.searchParams.get("v").slice(0, 11);
+          const match = url.pathname.match(/\/(embed|shorts)\/([\w-]{11})/);
+          if (match) return match[2];
+        }
+      } catch (err) {
+        // Not a valid URL — fall through to "".
+      }
+
+      return "";
+    },
+    youtubeThumb(id) {
+      return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+    },
+    youtubeEmbedUrl(id) {
+      return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+    },
+
     resetAll() {
       write(KEYS.posts, DEFAULT_POSTS);
       write(KEYS.gallery, DEFAULT_GALLERY);
+      write(KEYS.videos, DEFAULT_VIDEOS);
     },
 
     exportAll() {
@@ -195,6 +261,7 @@
         {
           posts: read(KEYS.posts, DEFAULT_POSTS),
           gallery: read(KEYS.gallery, DEFAULT_GALLERY),
+          videos: read(KEYS.videos, DEFAULT_VIDEOS),
         },
         null,
         2
@@ -204,6 +271,7 @@
       const data = JSON.parse(json);
       if (Array.isArray(data.posts)) write(KEYS.posts, data.posts);
       if (Array.isArray(data.gallery)) write(KEYS.gallery, data.gallery);
+      if (Array.isArray(data.videos)) write(KEYS.videos, data.videos);
     },
 
     formatDate(iso) {

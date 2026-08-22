@@ -84,7 +84,7 @@
     const modalForm = document.getElementById("entryForm");
     const closeModalBtn = document.getElementById("closeEntryModal");
 
-    let currentType = null; // 'post' | 'gallery'
+    let currentType = null; // 'post' | 'gallery' | 'video'
     let currentId = null;   // null when adding
 
     function fieldGroupsFor(type) {
@@ -141,7 +141,7 @@
       modalForm.reset();
       setPreview("");
 
-      const labels = { post: "Post", gallery: "Image" };
+      const labels = { post: "Post", gallery: "Image", video: "Video" };
       modalTitle.textContent = (id ? "Edit " : "Add ") + labels[type];
 
       if (id) {
@@ -149,13 +149,18 @@
 
         if (type === "post") record = CMS.getPosts().find(p => p.id === id);
         if (type === "gallery") record = CMS.getGallery().find(g => g.id === id);
+        if (type === "video") record = CMS.getVideos().find(v => v.id === id);
 
         if (record) {
           Object.keys(record).forEach(key => {
-            // The gallery form uses "galleryCategory" as the field name
-            // to avoid colliding with the post form's "category" field,
-            // since both live in the same shared modal.
-            const fieldName = (type === "gallery" && key === "category") ? "galleryCategory" : key;
+            // The gallery/video forms each reuse their own "category"
+            // field name to avoid colliding with the post form's
+            // "category" field, since all three share one modal.
+            let fieldName = key;
+            if (type === "gallery" && key === "category") fieldName = "galleryCategory";
+            if (type === "video" && key === "category") fieldName = "videoCategory";
+            if (type === "video" && key === "youtubeId") fieldName = "videoUrl";
+
             const field = modalForm.elements[fieldName];
             if (field) field.value = record[key];
           });
@@ -193,6 +198,18 @@
         data.category = data.galleryCategory;
         delete data.galleryCategory;
         currentId ? CMS.updateImage(currentId, data) : CMS.addImage(data);
+      }
+
+      if (currentType === "video") {
+        const youtubeId = CMS.extractYouTubeId(data.videoUrl);
+
+        if (!youtubeId) {
+          alert("That doesn't look like a valid YouTube link or video ID. Please check it and try again.");
+          return;
+        }
+
+        const video = { title: data.title, category: data.videoCategory, youtubeId };
+        currentId ? CMS.updateVideo(currentId, video) : CMS.addVideo(video);
       }
 
       closeModal();
@@ -257,9 +274,29 @@
       `).join("") : `<tr class="admin-empty-row"><td colspan="4">No images yet.</td></tr>`;
     }
 
+    function renderVideos() {
+      const tbody = document.getElementById("videosTable");
+      const items = CMS.getVideos();
+
+      tbody.innerHTML = items.length ? items.map(v => `
+        <tr>
+          <td><div class="row-title">${Fikrah.escapeHTML(v.title || "")}</div></td>
+          <td>${Fikrah.escapeHTML(v.category || "")}</td>
+          <td><a href="https://www.youtube.com/watch?v=${encodeURIComponent(v.youtubeId)}" target="_blank" rel="noopener">${Fikrah.escapeHTML(v.youtubeId || "")}</a></td>
+          <td>
+            <div class="admin-row-actions">
+              <button class="admin-btn" data-edit="video" data-id="${v.id}">Edit</button>
+              <button class="admin-btn danger" data-delete="video" data-id="${v.id}">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `).join("") : `<tr class="admin-empty-row"><td colspan="4">No videos yet.</td></tr>`;
+    }
+
     function renderAll() {
       renderPosts();
       renderGallery();
+      renderVideos();
     }
 
     document.addEventListener("click", event => {
@@ -281,6 +318,7 @@
 
         if (type === "post") CMS.deletePost(id);
         if (type === "gallery") CMS.deleteImage(id);
+        if (type === "video") CMS.deleteVideo(id);
 
         renderAll();
       }

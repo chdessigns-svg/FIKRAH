@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Session 104 | Fikrah Summit</title>
+  <title>Videos | Fikrah Summit</title>
 
-  <meta name="description" content="Recap of Fikrah Summit's 104th session, chaired by Eng. Nassor Morsady Hassan, held at the Adil Conference Center in Dar es Salaam." />
+  <meta name="description" content="Watch Fikrah Summit session highlights, speaker talks and community moments from our YouTube channel." />
 
   <meta name="theme-color" content="#c9152b" />
 
@@ -55,12 +55,12 @@
       <nav class="nav-links" id="navLinks">
         <a href="../index.html">Home</a>
         <a href="about.html">About</a>
-        <a href="sessions.html" class="active">Sessions</a>
+        <a href="sessions.html">Sessions</a>
         <a href="speakers.html">Speakers</a>
         <a href="community.html">Community</a>
         <a href="blog.html">Blog</a>
         <a href="gallery.html">Gallery</a>
-        <a href="videos.html">Videos</a>
+        <a href="videos.html" class="active">Videos</a>
         <a href="values.html">Values</a>
         <a href="join.html">Join</a>
         <a href="contact.html">Contact</a>
@@ -78,112 +78,26 @@
     </div>
   </header>
 
-  <main>
+  <main id="videos">
 
     <section class="page-header">
       <div class="container">
-        <div class="breadcrumb">
-          <a href="../index.html">Home</a><span>/</span>
-          <a href="sessions.html">Sessions</a><span>/</span>
-          <strong>Session 104</strong>
-        </div>
+        <div class="breadcrumb"><a href="../index.html">Home</a><span>/</span><strong>Videos</strong></div>
+        <span class="section-label">Videos</span>
+        <h1 class="section-title">Fikrah, <span>in motion.</span></h1>
+        <p class="section-description">
+          Session highlights, speaker talks and community moments
+          from our YouTube channel.
+        </p>
 
-        <div class="session-hero">
-          <span class="section-label">Session Detail</span>
-          <h1 class="section-title">The 104th Session</h1>
-          <p class="section-description">
-            Held at the Adil Conference Center on 11 July 2026, the
-            104th session brought together entrepreneurs, professionals
-            and students for an evening of structured learning and
-            networking.
-          </p>
-        </div>
+        <div class="gallery-filters" id="videoFilters"></div>
       </div>
     </section>
 
-    <section class="section-sm">
+    <section class="section">
       <div class="container">
 
-        <div class="session-feature reveal">
-          <div class="session-number" data-session="104">
-            <small>Milestone</small>
-            <strong>104</strong>
-            <span>Fikrah Summit Session</span>
-          </div>
-
-          <div class="session-details">
-            <span class="session-date">11 July 2026 • Dar es Salaam</span>
-            <h3>Leadership Through Presentation</h3>
-            <p>
-              Chaired by Eng. Nassor Morsady Hassan, this session focused
-              on how disciplined preparation and clear communication turn
-              good ideas into decisions people act on.
-            </p>
-
-            <div class="session-meta">
-              <span class="meta-item">📍 Adil Conference Center</span>
-              <span class="meta-item">🧠 Learning &amp; Development</span>
-              <span class="meta-item">🤝 Networking</span>
-              <span class="meta-item">⏱ 2 hours</span>
-            </div>
-
-            <button class="btn btn-primary" id="registerBtn">Register Interest for the Next Session →</button>
-          </div>
-        </div>
-
-        <div class="session-body">
-
-          <div class="reveal">
-            <h2 class="section-title" style="font-size: 2rem; margin-bottom: 20px;">What the session covered</h2>
-
-            <p>
-              Fikrah Summit's 104th session opened with a review of the
-              community's growth since its early days as DOUBLE G,
-              before moving into the evening's core theme: the power of
-              presentation as a leadership skill. Members practiced
-              structuring an argument, reading a room and closing with
-              a clear call to action.
-            </p>
-
-            <p>
-              As with every Fikrah session, the evening balanced formal
-              learning with open networking — giving entrepreneurs,
-              students and executives space to exchange contacts and
-              ideas outside the structured programme.
-            </p>
-
-            <p>
-              The session closed with a short Q&amp;A and an invitation
-              for members to propose topics for upcoming sessions,
-              keeping the agenda driven by what the community actually
-              wants to learn next.
-            </p>
-          </div>
-
-          <aside class="session-sidebar reveal">
-            <h4>Session Details</h4>
-
-            <div class="contact-item">
-              <div class="contact-icon">📍</div>
-              <div><strong>Venue</strong><span>Adil Conference Center, Dar es Salaam</span></div>
-            </div>
-
-            <div class="contact-item">
-              <div class="contact-icon">🗓</div>
-              <div><strong>Date</strong><span>11 July 2026</span></div>
-            </div>
-
-            <div class="contact-item">
-              <div class="contact-icon">🎙</div>
-              <div><strong>Chaired by</strong><span>Eng. Nassor Morsady Hassan</span></div>
-            </div>
-
-            <div class="hero-actions" style="margin-top: 20px;">
-              <a href="speakers.html" class="btn btn-secondary" style="width:100%;">View Speakers →</a>
-            </div>
-          </aside>
-
-        </div>
+        <div class="video-grid" id="videoGrid"></div>
 
       </div>
     </section>
@@ -297,8 +211,9 @@
   <div class="toast" id="toast"></div>
 
   <script src="../js/app.js"></script>
+  <script src="../js/cms.js"></script>
   <script src="../js/navigation.js"></script>
-  <script src="../js/sessions.js"></script>
+  <script src="../js/videos.js"></script>
 
 </body>
 </html>

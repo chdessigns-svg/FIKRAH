@@ -51,5 +51,8 @@
     { "id": "g7", "caption": "Opening remarks", "small": "Chairman's Address", "category": "Speakers", "image": "" },
     { "id": "g8", "caption": "Open floor discussion", "small": "Q&amp;A", "category": "Community", "image": "" },
     { "id": "g9", "caption": "Group photo", "small": "Closing", "category": "Community", "image": "" }
+  ],
+  "videos": [
+    { "id": "v1", "title": "Fikrah Summit — Session Highlights", "youtubeId": "58vNS3C0Jds", "category": "Sessions" }
   ]
 }

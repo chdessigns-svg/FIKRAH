@@ -141,6 +141,10 @@
   .blog-grid {
     grid-template-columns: 1fr 1fr;
   }
+
+  .video-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 @media (max-width: 650px) {
@@ -315,6 +319,10 @@
   }
 
   .blog-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .video-grid {
     grid-template-columns: 1fr;
   }
 
