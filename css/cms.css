@@ -1,0 +1,600 @@
+/* =========================================================
+   FIKRAH SUMMIT — CMS STYLESHEET
+   Covers: gradient cover blocks (used wherever a real photo
+   hasn't been uploaded yet), the homepage slider, the blog
+   grid + single post layout, dynamic gallery filtering, and
+   the /admin content manager UI.
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   COVER BLOCKS
+   Used as placeholder "images" for posts/gallery items until
+   a real photo is set via the admin panel. Swaps to a real
+   background-image automatically once one is provided.
+   --------------------------------------------------------- */
+
+.cms-cover {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background-size: cover;
+  background-position: center;
+}
+
+.cms-cover-letter {
+  font-family: "Playfair Display", serif;
+  font-weight: 800;
+  font-size: 3rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.g-variant-0 { background: linear-gradient(145deg, var(--red), #8b091b); }
+.g-variant-1 { background: linear-gradient(145deg, #b41127, #3b0610); }
+.g-variant-2 { background: linear-gradient(145deg, #24262b, #101114); }
+.g-variant-3 { background: linear-gradient(145deg, var(--red-dark), var(--red-deep)); }
+.g-variant-4 { background: linear-gradient(135deg, #690a18, #19191c); }
+
+/* ---------------------------------------------------------
+   HOMEPAGE SLIDER
+   --------------------------------------------------------- */
+
+.slider-section {
+  padding: 75px 0;
+}
+
+.slider-section-top {
+  padding: 32px 0 75px;
+}
+
+.slider {
+  position: relative;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.slider-viewport {
+  overflow: hidden;
+}
+
+.slider-track {
+  display: flex;
+  transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.slider-slide {
+  position: relative;
+  flex: 0 0 100%;
+  min-height: 340px;
+  padding: 70px;
+  color: white;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+}
+
+.slider-slide.has-photo {
+  background-color: var(--black);
+}
+
+.slider-slide-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(100deg, rgba(10, 6, 8, 0.88) 0%, rgba(10, 6, 8, 0.55) 55%, rgba(10, 6, 8, 0.25) 100%);
+}
+
+.slider-slide-content {
+  position: relative;
+  z-index: 2;
+}
+
+.slider-slide::before {
+  content: "";
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 50%;
+  right: -160px;
+  top: -180px;
+}
+
+.slider-slide::after {
+  content: "";
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  left: -110px;
+  bottom: -120px;
+}
+
+.slider-slide.has-photo::before,
+.slider-slide.has-photo::after {
+  display: none;
+}
+
+.slider-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 13px;
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  margin-bottom: 18px;
+  width: fit-content;
+}
+
+.slider-slide h2 {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1.05;
+  max-width: 640px;
+}
+
+.slider-slide p {
+  margin: 16px 0 26px;
+  max-width: 560px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.slider-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  color: white;
+  backdrop-filter: blur(6px);
+  display: grid;
+  place-items: center;
+  font-size: 1.3rem;
+  transition: var(--transition);
+}
+
+.slider-arrow:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.slider-arrow.prev { left: 20px; }
+.slider-arrow.next { right: 20px; }
+
+.slider-dots {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  right: 0;
+  bottom: 22px;
+  display: flex;
+  justify-content: center;
+  gap: 9px;
+}
+
+.slider-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  transition: var(--transition);
+}
+
+.slider-dot.active {
+  width: 22px;
+  border-radius: 999px;
+  background: white;
+}
+
+.slider-empty {
+  padding: 60px;
+  text-align: center;
+  color: var(--gray-500);
+  border: 1px dashed var(--gray-300);
+  border-radius: var(--radius-lg);
+}
+
+@media (max-width: 650px) {
+  .slider-slide {
+    padding: 40px 28px;
+    min-height: 300px;
+  }
+
+  .slider-arrow {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+/* ---------------------------------------------------------
+   BLOG GRID + SINGLE POST
+   --------------------------------------------------------- */
+
+.blog-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 30px 0 10px;
+}
+
+.blog-filter {
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--gray-300);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--gray-600);
+  transition: var(--transition);
+  background: none;
+}
+
+.blog-filter.active,
+.blog-filter:hover {
+  border-color: var(--red);
+  color: var(--red);
+  background: var(--red-light);
+}
+
+.blog-grid {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.blog-card {
+  display: block;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--white);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.blog-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-md);
+}
+
+.blog-card .cms-cover {
+  border-radius: 0;
+}
+
+.blog-card-body {
+  padding: 24px;
+}
+
+.blog-tag {
+  display: inline-block;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: var(--red-light);
+  color: var(--red);
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+}
+
+.blog-card h3 {
+  font-family: "Playfair Display", serif;
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+
+.blog-card p {
+  color: var(--gray-500);
+  font-size: 0.82rem;
+  margin-top: 10px;
+}
+
+.blog-meta {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--gray-200);
+  color: var(--gray-500);
+  font-size: 0.72rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.blog-empty {
+  margin-top: 40px;
+  padding: 60px;
+  text-align: center;
+  color: var(--gray-500);
+  border: 1px dashed var(--gray-300);
+  border-radius: var(--radius-lg);
+}
+
+.post-header {
+  max-width: 800px;
+}
+
+.post-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  color: var(--gray-500);
+  font-size: 0.8rem;
+  margin: 18px 0 30px;
+}
+
+.post-meta-row span {
+  padding: 7px 12px;
+  border: 1px solid var(--gray-200);
+  border-radius: 999px;
+}
+
+.post-cover {
+  margin: 10px 0 40px;
+  aspect-ratio: 21 / 9;
+}
+
+.post-body {
+  max-width: 760px;
+  color: var(--gray-700);
+  font-size: 1.02rem;
+}
+
+.post-body p {
+  margin-bottom: 20px;
+}
+
+/* ---------------------------------------------------------
+   ADMIN / CONTENT MANAGER
+   --------------------------------------------------------- */
+
+.admin-shell {
+  min-height: 100vh;
+  background: var(--gray-100);
+}
+
+.admin-gate {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 25px;
+}
+
+.admin-gate-card {
+  width: min(420px, 100%);
+  padding: 40px;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+
+.admin-gate-card .logo-mark {
+  margin-inline: auto;
+  margin-bottom: 18px;
+}
+
+.admin-gate-card p {
+  color: var(--gray-500);
+  font-size: 0.85rem;
+  margin: 10px 0 22px;
+}
+
+.admin-gate-card .form-group {
+  text-align: left;
+}
+
+.admin-topbar {
+  background: var(--black);
+  color: white;
+  padding: 18px 0;
+}
+
+.admin-topbar .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.admin-topbar .logo-name,
+.admin-topbar .logo-subtitle {
+  color: white;
+}
+
+.admin-topbar .logo-subtitle {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.admin-body {
+  padding: 40px 0 90px;
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.admin-tab {
+  padding: 12px 20px;
+  border-radius: 12px;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--gray-600);
+  transition: var(--transition);
+}
+
+.admin-tab.active {
+  background: var(--red);
+  border-color: var(--red);
+  color: white;
+}
+
+.admin-panel {
+  display: none;
+}
+
+.admin-panel.active {
+  display: block;
+}
+
+.admin-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+
+.admin-toolbar h2 {
+  font-family: "Playfair Display", serif;
+  font-size: 1.6rem;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.admin-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 24px;
+  align-items: start;
+}
+
+.admin-card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th {
+  text-align: left;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gray-500);
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.admin-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--gray-200);
+  font-size: 0.85rem;
+  vertical-align: top;
+}
+
+.admin-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.admin-table .row-title {
+  font-weight: 700;
+}
+
+.admin-table .row-sub {
+  color: var(--gray-500);
+  font-size: 0.75rem;
+  margin-top: 3px;
+}
+
+.admin-row-actions {
+  display: flex;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.admin-btn {
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border: 1px solid var(--gray-300);
+  background: var(--white);
+  color: var(--gray-700);
+  transition: var(--transition);
+}
+
+.admin-btn:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.admin-btn.danger:hover {
+  border-color: #c0392b;
+  color: #c0392b;
+}
+
+.admin-btn.primary {
+  background: var(--red);
+  border-color: var(--red);
+  color: white;
+}
+
+.admin-btn.primary:hover {
+  background: var(--red-dark);
+  color: white;
+}
+
+.admin-empty-row td {
+  text-align: center;
+  color: var(--gray-500);
+  padding: 30px 12px;
+}
+
+.admin-cover-preview {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border-radius: 10px;
+  margin-top: 8px;
+}
+
+.admin-note {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--red-light);
+  color: var(--red-dark);
+  font-size: 0.78rem;
+}
+
+.admin-note strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.admin-import-input {
+  display: none;
+}
+
+@media (max-width: 1000px) {
+  .admin-layout {
+    grid-template-columns: 1fr;
+  }
+}

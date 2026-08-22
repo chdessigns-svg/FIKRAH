@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Blog | Fikrah Summit</title>
+
+  <meta name="description" content="Session recaps, speaker takeaways and community updates from Fikrah Summit in Dar es Salaam." />
+
+  <meta name="theme-color" content="#c9152b" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/pages.css" />
+  <link rel="stylesheet" href="../css/cms.css" />
+  <link rel="stylesheet" href="../css/responsive.css" />
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <div class="topbar-left">
+        <span>Dar es Salaam, Tanzania</span>
+        <span>•</span>
+        <span>Professional Learning Community</span>
+      </div>
+
+      <div class="topbar-right">
+        <a href="sessions.html">Sessions</a>
+        <a href="community.html">Members</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </div>
+  </div>
+  <header class="navbar">
+    <div class="container nav-inner">
+
+      <a href="../index.html" class="logo">
+        <span class="logo-mark">F</span>
+
+        <span class="logo-text">
+          <span class="logo-name">Fikrah Summit</span>
+          <span class="logo-subtitle">Empowering Minds</span>
+        </span>
+      </a>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="../index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="sessions.html">Sessions</a>
+        <a href="speakers.html">Speakers</a>
+        <a href="community.html">Community</a>
+        <a href="blog.html" class="active">Blog</a>
+        <a href="gallery.html">Gallery</a>
+        <a href="values.html">Values</a>
+        <a href="join.html">Join</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="icon-btn" id="searchBtn" aria-label="Search" title="Search">⌕</button>
+        <button class="icon-btn" id="themeBtn" aria-label="Toggle dark mode" title="Toggle dark mode">◐</button>
+
+        <a href="join.html" class="btn btn-primary">Join Us</a>
+
+        <button class="icon-btn mobile-toggle" id="mobileToggle" aria-label="Open menu">☰</button>
+      </div>
+
+    </div>
+  </header>
+
+  <main id="blog">
+
+    <section class="page-header">
+      <div class="container">
+        <div class="breadcrumb"><a href="../index.html">Home</a><span>/</span><strong>Blog</strong></div>
+        <span class="section-label">From the Blog</span>
+        <h1 class="section-title">Notes, recaps <span>&amp; ideas.</span></h1>
+        <p class="section-description">
+          Session recaps, speaker takeaways and community updates —
+          managed from the Fikrah content manager, no code required.
+        </p>
+
+        <div class="blog-filters" id="blogFilters"></div>
+      </div>
+    </section>
+
+    <section class="section-sm">
+      <div class="container">
+
+        <div class="blog-grid" id="blogGrid"></div>
+        <div class="blog-empty" id="blogEmpty" style="display:none;">No posts match this category yet.</div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container">
+
+      <div class="footer-grid">
+
+        <div class="footer-brand">
+          <a href="../index.html" class="logo footer-logo">
+            <span class="logo-mark">F</span>
+            <span class="logo-text">
+              <span class="logo-name">Fikrah Summit</span>
+              <span class="logo-subtitle">Empowering Minds</span>
+            </span>
+          </a>
+
+          <p>
+            Empowering Minds. Building Leaders. Creating Impact.
+            A professional community for learning, leadership,
+            networking and growth, based in Dar es Salaam.
+          </p>
+        </div>
+
+        <div class="footer-column">
+          <h4>Explore</h4>
+          <a href="about.html">About Fikrah</a>
+          <a href="sessions.html">Sessions</a>
+          <a href="speakers.html">Speakers</a>
+          <a href="community.html">Community</a>
+        </div>
+
+        <div class="footer-column">
+          <h4>Community</h4>
+          <a href="join.html">Join Fikrah</a>
+          <a href="gallery.html">Gallery</a>
+          <a href="values.html">Our Values</a>
+          <a href="contact.html">Contact</a>
+        </div>
+
+        <div class="footer-column">
+          <h4>Learning</h4>
+          <a href="sessions.html">Leadership</a>
+          <a href="sessions.html">Business</a>
+          <a href="sessions.html">Entrepreneurship</a>
+          <a href="sessions.html">Personal Development</a>
+        </div>
+
+      </div>
+
+      <div class="footer-bottom">
+        <span>© <span id="year"></span> Fikrah Summit. All rights reserved.</span>
+        <span>Empowering Minds • Building Leaders • Creating Impact</span>
+        <a href="../admin/index.html" style="color:#66686f;">Content Manager →</a>
+      </div>
+
+    </div>
+  </footer>
+
+  <div class="search-overlay" id="searchOverlay" aria-hidden="true">
+    <div class="search-box">
+      <input id="globalSearch" type="search" placeholder="Search Fikrah Summit..." autocomplete="off" />
+      <button class="search-close" id="searchClose" aria-label="Close search">×</button>
+    </div>
+  </div>
+
+  <div class="modal" id="registrationModal" aria-hidden="true">
+    <div class="modal-card">
+
+      <div class="modal-head">
+        <div>
+          <span class="section-label">Session Registration</span>
+          <h3>Register your interest.</h3>
+        </div>
+        <button class="close-modal" id="closeRegistration" aria-label="Close">×</button>
+      </div>
+
+      <form id="registrationForm">
+
+        <div class="form-group">
+          <label for="regName">Full Name</label>
+          <input class="form-control" id="regName" type="text" required placeholder="Your full name" />
+        </div>
+
+        <div class="form-group">
+          <label for="regEmail">Email Address</label>
+          <input class="form-control" id="regEmail" type="email" required placeholder="you@example.com" />
+        </div>
+
+        <div class="form-group">
+          <label for="regProfession">Profession / Role</label>
+          <input class="form-control" id="regProfession" type="text" placeholder="Entrepreneur, student, executive..." required />
+        </div>
+
+        <div class="form-group">
+          <label for="regReason">Why would you like to attend?</label>
+          <textarea class="form-control" id="regReason" placeholder="Tell us briefly..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit Registration →</button>
+
+      </form>
+
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/app.js"></script>
+  <script src="../js/cms.js"></script>
+  <script src="../js/navigation.js"></script>
+  <script src="../js/blog.js"></script>
+
+</body>
+</html>

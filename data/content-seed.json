@@ -1,0 +1,55 @@
+{
+  "posts": [
+    {
+      "id": "post_1",
+      "title": "Recap: The 104th Session at Adil Conference Center",
+      "excerpt": "Chaired by Eng. Nassor Morsady Hassan, Session 104 explored how disciplined presentation turns good ideas into decisions people act on.",
+      "body": "Fikrah Summit's 104th session opened with a review of the community's growth since its early days as DOUBLE G, before moving into the evening's core theme: the power of presentation as a leadership skill.\n\nMembers practiced structuring an argument, reading a room and closing with a clear call to action. As with every Fikrah session, the evening balanced formal learning with open networking, giving entrepreneurs, students and executives space to exchange contacts and ideas outside the structured programme.\n\nThe session closed with a short Q&A and an invitation for members to propose topics for upcoming sessions.",
+      "category": "Session Recap",
+      "date": "2026-07-11",
+      "author": "Fikrah Summit",
+      "image": ""
+    },
+    {
+      "id": "post_2",
+      "title": "Why We Renamed DOUBLE G to Fikrah Summit",
+      "excerpt": "A short look at the philosophy behind the community's evolution — and what stays the same.",
+      "body": "Originally founded as DOUBLE G (Givers Gain), our community evolved into Fikrah Summit with a renewed philosophy and a stronger focus on leadership, entrepreneurship, business excellence and lifelong learning.\n\nThe name change reflected something deeper than branding: a shift toward structured, weekly learning built around real speakers, real case studies and real accountability between members.\n\nWhat hasn't changed is the belief that gathering ambitious people in one room, consistently, compounds into something bigger than any single session.",
+      "category": "Community",
+      "date": "2026-05-02",
+      "author": "Fikrah Summit",
+      "image": ""
+    },
+    {
+      "id": "post_3",
+      "title": "Five Takeaways from Prof. Mussa J. Assad on Academic Leadership",
+      "excerpt": "Notes from Session 61, where the Vice Chancellor of Muslim University of Morogoro joined Fikrah for a conversation on leading institutions.",
+      "body": "When Prof. Mussa J. Assad, Vice Chancellor of Muslim University of Morogoro, joined Fikrah Summit for Session 61, the room filled quickly.\n\nHis talk moved between academic governance and everyday leadership — the discipline of listening before deciding, the cost of avoiding hard conversations, and why institutions (like communities) grow only as fast as the trust inside them.\n\nMembers left with a simple challenge: apply one habit from academic leadership to their own business or team this month.",
+      "category": "Session Recap",
+      "date": "2026-02-14",
+      "author": "Fikrah Summit",
+      "image": ""
+    },
+    {
+      "id": "post_4",
+      "title": "Finance for Founders: What Actually Matters Early On",
+      "excerpt": "Said Mshana breaks down the handful of financial habits that separate businesses that survive year one from those that don't.",
+      "body": "Said Mshana, Senior Finance Manager at Amana Bank Limited, used Session 94 to strip business finance down to fundamentals: cash flow discipline, separating personal and business accounts, and building a habit of monthly reconciliation.\n\nThe session's most repeated line: 'Profit is an opinion, cash is a fact.' Members were encouraged to build a simple weekly cash tracker before adding any complexity to their books.",
+      "category": "Finance",
+      "date": "2026-01-18",
+      "author": "Fikrah Summit",
+      "image": ""
+    }
+  ],
+  "gallery": [
+    { "id": "g1", "caption": "People. Ideas. Connections.", "small": "Fikrah Summit", "category": "Community", "image": "" },
+    { "id": "g2", "caption": "Learning together", "small": "Session", "category": "Sessions", "image": "" },
+    { "id": "g3", "caption": "Networking", "small": "Community", "category": "Community", "image": "" },
+    { "id": "g4", "caption": "Sharing experience", "small": "Speaker", "category": "Speakers", "image": "" },
+    { "id": "g5", "caption": "Creating impact", "small": "Highlights", "category": "Sessions", "image": "" },
+    { "id": "g6", "caption": "Adil Conference Center", "small": "Session 104", "category": "Sessions", "image": "" },
+    { "id": "g7", "caption": "Opening remarks", "small": "Chairman's Address", "category": "Speakers", "image": "" },
+    { "id": "g8", "caption": "Open floor discussion", "small": "Q&amp;A", "category": "Community", "image": "" },
+    { "id": "g9", "caption": "Group photo", "small": "Closing", "category": "Community", "image": "" }
+  ]
+}

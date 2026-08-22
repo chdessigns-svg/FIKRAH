@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+
+  <title>Content Manager | Fikrah Summit</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/cms.css" />
+</head>
+<body class="admin-shell">
+
+  <!-- PASSWORD GATE -->
+  <div class="admin-gate" id="adminGate">
+    <div class="admin-gate-card">
+      <span class="logo-mark">F</span>
+      <h1 class="section-title" style="font-size: 1.6rem;">Content Manager</h1>
+      <p>
+        Manage blog posts (which also power the homepage slider) and
+        gallery images for Fikrah Summit. This is a lightweight,
+        browser-only editor — see the note at the bottom of the page
+        for how it works.
+      </p>
+
+      <form id="adminGateForm">
+        <div class="form-group">
+          <label for="adminPassword">Access Code</label>
+          <input class="form-control" id="adminPassword" type="password" placeholder="Enter access code" required autofocus />
+        </div>
+
+        <p id="adminGateError" style="display:none; color:#c0392b; font-size:0.8rem; margin-bottom: 14px;">
+          That access code isn't right — try again.
+        </p>
+
+        <button type="submit" class="btn btn-primary" style="width:100%;">Enter →</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADMIN SHELL -->
+  <div id="adminShell" style="display:none;">
+
+    <div class="admin-topbar">
+      <div class="container">
+        <a href="#" class="logo">
+          <span class="logo-mark">F</span>
+          <span class="logo-text">
+            <span class="logo-name">Fikrah Summit</span>
+            <span class="logo-subtitle">Content Manager</span>
+          </span>
+        </a>
+
+        <div style="display:flex; gap:10px; align-items:center;">
+          <a href="../index.html" class="btn btn-secondary" style="min-height:40px; padding:0 16px;">View Site</a>
+          <button class="btn btn-secondary" id="adminLogout" style="min-height:40px; padding:0 16px;">Log Out</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-body">
+      <div class="container">
+
+        <div class="admin-tabs">
+          <button class="admin-tab active" data-tab="posts">Blog Posts &amp; Slider</button>
+          <button class="admin-tab" data-tab="gallery">Gallery</button>
+        </div>
+
+        <!-- POSTS PANEL -->
+        <section class="admin-panel active" id="panel-posts">
+          <div class="admin-toolbar">
+            <div>
+              <h2>Blog Posts &amp; Slider</h2>
+              <p style="color: var(--gray-500); font-size: 0.8rem; margin-top: 4px;">
+                The homepage slider automatically shows your 5 most recent posts — add or edit a post here and it updates the slider too.
+              </p>
+            </div>
+            <div class="admin-actions">
+              <button class="admin-btn primary" data-add="post">+ Add Post</button>
+            </div>
+          </div>
+
+          <div class="admin-card">
+            <table class="admin-table">
+              <thead>
+                <tr><th>Post</th><th>Category</th><th>Date</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="postsTable"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- GALLERY PANEL -->
+        <section class="admin-panel" id="panel-gallery">
+          <div class="admin-toolbar">
+            <h2>Gallery Images</h2>
+            <div class="admin-actions">
+              <button class="admin-btn primary" data-add="gallery">+ Add Image</button>
+            </div>
+          </div>
+
+          <div class="admin-card">
+            <table class="admin-table">
+              <thead>
+                <tr><th>Image</th><th>Category</th><th>Photo</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="galleryTable"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- DATA TOOLS -->
+        <div class="admin-card" style="margin-top: 30px;">
+          <div class="admin-toolbar" style="margin-bottom: 10px;">
+            <h2 style="font-size: 1.2rem;">Backup &amp; Sync</h2>
+          </div>
+
+          <div class="admin-actions">
+            <button class="admin-btn primary" id="exportBtn">⬇ Export All Content (JSON)</button>
+            <button class="admin-btn" id="importBtn">⬆ Import Content File</button>
+            <input type="file" id="importInput" class="admin-import-input" accept="application/json" />
+            <button class="admin-btn danger" id="resetBtn">Reset to Defaults</button>
+          </div>
+
+          <div class="admin-note">
+            <strong>How this works</strong>
+            Everything you add here is saved in this browser only (not on a
+            server). To make your edits appear for real site visitors,
+            click <strong>Export All Content</strong> and send the
+            downloaded <code>fikrah-content-export.json</code> file to
+            whoever deploys the site, so it can replace
+            <code>data/content-seed.json</code>. Use <strong>Import Content
+            File</strong> to load that file back in on any browser —
+            handy for editing on a different computer, or for sharing
+            drafts with a teammate. Uploaded photos are stored directly
+            in this export file, so large or many photos can make it a
+            big file — compress images before uploading where you can.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SHARED ADD/EDIT MODAL -->
+  <div class="modal" id="entryModal" aria-hidden="true">
+    <div class="modal-card">
+
+      <div class="modal-head">
+        <h3 id="entryModalTitle">Add Entry</h3>
+        <button class="close-modal" id="closeEntryModal" aria-label="Close">×</button>
+      </div>
+
+      <form id="entryForm">
+
+        <!-- SHARED: TITLE -->
+        <div data-field-for="post" class="form-group">
+          <label for="f-title">Title</label>
+          <input class="form-control" id="f-title" name="title" type="text" required />
+        </div>
+
+        <!-- POST FIELDS -->
+        <div data-field-for="post" class="form-row">
+          <div class="form-group">
+            <label for="f-category">Category</label>
+            <input class="form-control" id="f-category" name="category" type="text" placeholder="e.g. Leadership" />
+          </div>
+          <div class="form-group">
+            <label for="f-date">Date</label>
+            <input class="form-control" id="f-date" name="date" type="date" />
+          </div>
+        </div>
+
+        <div data-field-for="post" class="form-group">
+          <label for="f-author">Author</label>
+          <input class="form-control" id="f-author" name="author" type="text" placeholder="Fikrah Summit" />
+        </div>
+
+        <div data-field-for="post" class="form-group">
+          <label for="f-excerpt">Excerpt</label>
+          <textarea class="form-control" id="f-excerpt" name="excerpt" placeholder="One-sentence summary shown on the blog grid and the slider"></textarea>
+        </div>
+
+        <div data-field-for="post" class="form-group">
+          <label for="f-body">Full Post</label>
+          <textarea class="form-control" id="f-body" name="body" style="min-height:180px;" placeholder="Separate paragraphs with a blank line"></textarea>
+        </div>
+
+        <!-- GALLERY FIELDS -->
+        <div data-field-for="gallery" class="form-group">
+          <label for="f-caption">Caption</label>
+          <input class="form-control" id="f-caption" name="caption" type="text" placeholder="e.g. Learning together" />
+        </div>
+
+        <div data-field-for="gallery" class="form-group">
+          <label for="f-small">Small Label</label>
+          <input class="form-control" id="f-small" name="small" type="text" placeholder="e.g. Session 104" />
+        </div>
+
+        <div data-field-for="gallery" class="form-group">
+          <label for="f-galleryCategory">Category</label>
+          <input class="form-control" id="f-galleryCategory" name="galleryCategory" type="text" placeholder="e.g. Sessions, Speakers, Community" />
+        </div>
+
+        <!-- SHARED: PHOTO UPLOAD -->
+        <div data-field-for="post,gallery" class="form-group">
+          <label for="f-imageFile">Photo</label>
+          <input class="form-control" id="f-imageFile" type="file" accept="image/*" />
+          <img id="f-imagePreview" class="admin-cover-preview" style="display:none;" alt="Selected photo preview" />
+          <input type="hidden" id="f-image" name="image" />
+          <p style="color: var(--gray-500); font-size: 0.72rem; margin-top: 6px;">
+            Upload a photo from your device, or leave blank to use an
+            automatic color placeholder. Uploading a new photo replaces
+            the current one.
+          </p>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%;">Save →</button>
+
+      </form>
+
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../js/app.js"></script>
+  <script src="../js/cms.js"></script>
+  <script src="../js/admin.js"></script>
+
+</body>
+</html>
