@@ -46,6 +46,48 @@
         </p>
 
         <button type="submit" class="btn btn-primary" style="width:100%;">Sign In →</button>
+        <button type="button" id="forgotPasswordLink" class="admin-link-btn">Forgot password?</button>
+      </form>
+
+      <!-- FORGOT PASSWORD -->
+      <form id="forgotPasswordForm" style="display:none;">
+        <p style="color: var(--gray-500); font-size: 0.85rem; margin-bottom: 16px;">
+          Enter your admin email and we'll send you a link to set a new password.
+        </p>
+
+        <div class="form-group">
+          <label for="forgotEmail">Email</label>
+          <input class="form-control" id="forgotEmail" type="email" placeholder="you@fikrahsummit.com" required />
+        </div>
+
+        <p id="forgotError" style="display:none; color:#c0392b; font-size:0.8rem; margin-bottom: 14px;"></p>
+        <p id="forgotSuccess" style="display:none; color: var(--gray-600); font-size:0.85rem; margin-bottom: 14px;">
+          Check your email for a password reset link.
+        </p>
+
+        <button type="submit" class="btn btn-primary" style="width:100%;">Send Reset Link →</button>
+        <button type="button" id="forgotCancelLink" class="admin-link-btn">Back to Sign In</button>
+      </form>
+
+      <!-- SET NEW PASSWORD (after clicking the emailed reset link) -->
+      <form id="resetPasswordForm" style="display:none;">
+        <p style="color: var(--gray-500); font-size: 0.85rem; margin-bottom: 16px;">
+          Choose a new password for your admin account.
+        </p>
+
+        <div class="form-group">
+          <label for="newPassword">New Password</label>
+          <input class="form-control" id="newPassword" type="password" placeholder="At least 6 characters" required minlength="6" />
+        </div>
+
+        <div class="form-group">
+          <label for="newPasswordConfirm">Confirm New Password</label>
+          <input class="form-control" id="newPasswordConfirm" type="password" placeholder="Repeat the password" required minlength="6" />
+        </div>
+
+        <p id="resetError" style="display:none; color:#c0392b; font-size:0.8rem; margin-bottom: 14px;"></p>
+
+        <button type="submit" class="btn btn-primary" style="width:100%;">Set New Password →</button>
       </form>
     </div>
   </div>

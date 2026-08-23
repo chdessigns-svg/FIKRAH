@@ -122,7 +122,19 @@
     },
     onAuthChange(callback) {
       if (!supabaseClient) return;
-      supabaseClient.auth.onAuthStateChange((_event, session) => callback(session));
+      supabaseClient.auth.onAuthStateChange((event, session) => callback(event, session));
+    },
+    async resetPasswordForEmail(email) {
+      const client = requireClient();
+      const { error } = await client.auth.resetPasswordForEmail(email, {
+        redirectTo: global.location.origin + global.location.pathname,
+      });
+      if (error) throw new Error(error.message);
+    },
+    async updatePassword(newPassword) {
+      const client = requireClient();
+      const { error } = await client.auth.updateUser({ password: newPassword });
+      if (error) throw new Error(error.message);
     },
 
     /* ---- PHOTO UPLOAD (Supabase Storage, bucket "media") ---- */

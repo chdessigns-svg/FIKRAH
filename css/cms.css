@@ -524,6 +524,21 @@
   text-align: left;
 }
 
+.admin-link-btn {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  color: var(--gray-500);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  background: none;
+}
+
+.admin-link-btn:hover {
+  color: var(--red);
+}
+
 .admin-topbar {
   background: var(--black);
   color: white;

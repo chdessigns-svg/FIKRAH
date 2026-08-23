@@ -17,6 +17,15 @@
     const gateError = document.getElementById("adminGateError");
     const logoutBtn = document.getElementById("adminLogout");
 
+    const forgotLink = document.getElementById("forgotPasswordLink");
+    const forgotForm = document.getElementById("forgotPasswordForm");
+    const forgotCancelLink = document.getElementById("forgotCancelLink");
+    const forgotError = document.getElementById("forgotError");
+    const forgotSuccess = document.getElementById("forgotSuccess");
+
+    const resetForm = document.getElementById("resetPasswordForm");
+    const resetError = document.getElementById("resetError");
+
     if (!window.CMS || !CMS.isConfigured()) {
       gate.innerHTML = `
         <div class="admin-gate-card">
@@ -38,13 +47,47 @@
       await renderAll();
     }
 
+    function showSignInView() {
+      gateForm.style.display = "block";
+      forgotForm.style.display = "none";
+      resetForm.style.display = "none";
+    }
+
+    function showForgotView() {
+      gateForm.style.display = "none";
+      forgotForm.style.display = "block";
+      resetForm.style.display = "none";
+      forgotError.style.display = "none";
+      forgotSuccess.style.display = "none";
+    }
+
+    function showResetView() {
+      gateForm.style.display = "none";
+      forgotForm.style.display = "none";
+      resetForm.style.display = "block";
+    }
+
     function showGate() {
       shell.style.display = "none";
       gate.style.display = "grid";
+      showSignInView();
     }
 
+    // Supabase signs a visitor in automatically when they land here via
+    // the "reset your password" email link, then fires this event — show
+    // the "set a new password" form instead of unlocking the CMS.
+    CMS.onAuthChange(event => {
+      if (event === "PASSWORD_RECOVERY") {
+        showResetView();
+      }
+    });
+
+    const isRecoveryLink = window.location.hash.includes("type=recovery");
     const session = await CMS.getSession();
-    if (session) {
+
+    if (isRecoveryLink) {
+      showResetView();
+    } else if (session) {
       await unlock();
     }
 
@@ -67,6 +110,70 @@
         submitBtn.disabled = false;
       }
     });
+
+    if (forgotLink) {
+      forgotLink.addEventListener("click", showForgotView);
+    }
+
+    if (forgotCancelLink) {
+      forgotCancelLink.addEventListener("click", () => {
+        forgotForm.reset();
+        showSignInView();
+      });
+    }
+
+    if (forgotForm) {
+      forgotForm.addEventListener("submit", async event => {
+        event.preventDefault();
+        const email = document.getElementById("forgotEmail").value;
+        const submitBtn = forgotForm.querySelector("button[type=submit]");
+
+        forgotError.style.display = "none";
+        forgotSuccess.style.display = "none";
+        submitBtn.disabled = true;
+
+        try {
+          await CMS.resetPasswordForEmail(email);
+          forgotSuccess.style.display = "block";
+        } catch (err) {
+          forgotError.textContent = err.message;
+          forgotError.style.display = "block";
+        } finally {
+          submitBtn.disabled = false;
+        }
+      });
+    }
+
+    if (resetForm) {
+      resetForm.addEventListener("submit", async event => {
+        event.preventDefault();
+        const newPassword = document.getElementById("newPassword").value;
+        const newPasswordConfirm = document.getElementById("newPasswordConfirm").value;
+        const submitBtn = resetForm.querySelector("button[type=submit]");
+
+        resetError.style.display = "none";
+
+        if (newPassword !== newPasswordConfirm) {
+          resetError.textContent = "Those passwords don't match.";
+          resetError.style.display = "block";
+          return;
+        }
+
+        submitBtn.disabled = true;
+
+        try {
+          await CMS.updatePassword(newPassword);
+          history.replaceState(null, "", window.location.pathname);
+          resetForm.reset();
+          await unlock();
+        } catch (err) {
+          resetError.textContent = err.message;
+          resetError.style.display = "block";
+        } finally {
+          submitBtn.disabled = false;
+        }
+      });
+    }
 
     if (logoutBtn) {
       logoutBtn.addEventListener("click", async () => {
