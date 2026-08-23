@@ -41,9 +41,50 @@
       return;
     }
 
+    /* -----------------------------------------------------
+       AUTO SIGN-OUT AFTER 10 MINUTES IDLE
+       ----------------------------------------------------- */
+
+    const IDLE_LIMIT_MS = 10 * 60 * 1000;
+    let idleTimer = null;
+    let isSignedIn = false;
+
+    function clearIdleTimer() {
+      clearTimeout(idleTimer);
+      idleTimer = null;
+    }
+
+    function scheduleIdleLogout() {
+      if (!isSignedIn) return;
+      clearIdleTimer();
+      idleTimer = setTimeout(async () => {
+        await CMS.signOut();
+        showGate();
+        Fikrah.showToastIfPresent("Signed out after 10 minutes of inactivity.");
+      }, IDLE_LIMIT_MS);
+    }
+
+    ["click", "keydown", "mousemove", "scroll", "touchstart"].forEach(evt => {
+      document.addEventListener(evt, scheduleIdleLogout, { passive: true });
+    });
+
+    // If a save/delete fails because the session has quietly expired
+    // (a long-idle tab, a revoked token), sign out and prompt a fresh
+    // login instead of leaving the admin stuck on a cryptic error.
+    async function isSessionError(err) {
+      if (!/jwt|token|session|auth/i.test(err.message || "")) return false;
+      if (await CMS.getSession()) return false; // some other kind of error
+      showGate();
+      gateError.textContent = "Your session expired — please sign in again.";
+      gateError.style.display = "block";
+      return true;
+    }
+
     async function unlock() {
       gate.style.display = "none";
       shell.style.display = "block";
+      isSignedIn = true;
+      scheduleIdleLogout();
       await renderAll();
     }
 
@@ -68,6 +109,8 @@
     }
 
     function showGate() {
+      isSignedIn = false;
+      clearIdleTimer();
       shell.style.display = "none";
       gate.style.display = "grid";
       showSignInView();
@@ -348,11 +391,16 @@
           currentId ? await CMS.updateVideo(currentId, video) : await CMS.addVideo(video);
         }
 
+        const savedType = currentType;
         closeModal();
-        await renderAll();
+        if (savedType === "post") await renderPosts();
+        if (savedType === "gallery") await renderGallery();
+        if (savedType === "video") await renderVideos();
         Fikrah.showToastIfPresent("Saved.");
       } catch (err) {
-        alert("Couldn't save this: " + err.message);
+        if (!(await isSessionError(err))) {
+          alert("Couldn't save this: " + err.message);
+        }
       } finally {
         submitBtn.disabled = false;
       }
@@ -464,12 +512,13 @@
         }
 
         try {
-          if (type === "post") await CMS.deletePost(id);
-          if (type === "gallery") await CMS.deleteImage(id);
-          if (type === "video") await CMS.deleteVideo(id);
-          await renderAll();
+          if (type === "post") { await CMS.deletePost(id); await renderPosts(); }
+          if (type === "gallery") { await CMS.deleteImage(id); await renderGallery(); }
+          if (type === "video") { await CMS.deleteVideo(id); await renderVideos(); }
         } catch (err) {
-          alert("Couldn't delete this: " + err.message);
+          if (!(await isSessionError(err))) {
+            alert("Couldn't delete this: " + err.message);
+          }
         }
       }
     });
