@@ -104,3 +104,22 @@ using (bucket_id = 'media' and auth.role() = 'authenticated');
 create policy "admin delete media"
 on storage.objects for delete
 using (bucket_id = 'media' and auth.role() = 'authenticated');
+
+-- Demo placeholder photos (Lorem Picsum) so the site doesn't look
+-- empty before real photos are uploaded through /admin. Safe to
+-- re-run — each row gets a stable placeholder keyed to its position.
+with ordered as (
+  select id, row_number() over (order by created_at) as rn from gallery
+)
+update gallery g
+set image = 'https://picsum.photos/seed/fikrah-gallery-' || o.rn || '/800/600'
+from ordered o
+where g.id = o.id;
+
+with ordered as (
+  select id, row_number() over (order by created_at) as rn from posts
+)
+update posts p
+set image = 'https://picsum.photos/seed/fikrah-post-' || o.rn || '/1200/700'
+from ordered o
+where p.id = o.id;
