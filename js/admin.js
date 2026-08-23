@@ -436,7 +436,7 @@
           <td>${CMS.formatDate(p.date)}</td>
           <td>
             <div class="admin-row-actions">
-              <a class="admin-btn" href="../pages/post.html?id=${encodeURIComponent(p.id)}" target="_blank" rel="noopener">View</a>
+              <a class="admin-btn" href="/post?id=${encodeURIComponent(p.id)}" target="_blank" rel="noopener">View</a>
               <button class="admin-btn" data-edit="post" data-id="${p.id}">Edit</button>
               <button class="admin-btn danger" data-delete="post" data-id="${p.id}">Delete</button>
             </div>

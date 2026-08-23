@@ -10,11 +10,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  function cardHTML(post, basePath) {
+  function cardHTML(post) {
     const cover = CMS.coverBlock(post.title, post.image, hashVariant(post.id), post.title);
 
     return `
-      <a class="blog-card reveal" href="${basePath}post.html?id=${encodeURIComponent(post.id)}">
+      <a class="blog-card reveal" href="/post?id=${encodeURIComponent(post.id)}">
         ${cover}
         <div class="blog-card-body">
           <span class="blog-tag">${Fikrah.escapeHTML(post.category || "Update")}</span>
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const categories = Array.from(new Set(posts.map(p => p.category).filter(Boolean)));
 
     function render(list) {
-      grid.innerHTML = list.map(post => cardHTML(post, "")).join("");
+      grid.innerHTML = list.map(post => cardHTML(post)).join("");
       if (empty) {
         empty.style.display = list.length ? "none" : "block";
       }
@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const latest = (await CMS.getPosts()).slice(0, 3);
 
     teaser.innerHTML = latest.length
-      ? latest.map(post => cardHTML(post, "pages/")).join("")
+      ? latest.map(post => cardHTML(post)).join("")
       : '<div class="blog-empty">No posts yet — add one from the content manager.</div>';
     Fikrah.observeReveals(teaser);
   }

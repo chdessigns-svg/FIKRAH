@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <span class="slider-eyebrow">${Fikrah.escapeHTML(post.category || "Fikrah Summit")}</span>
                 <h2>${Fikrah.escapeHTML(post.title || "")}</h2>
                 <p>${Fikrah.escapeHTML(post.excerpt || "")}</p>
-                <a class="btn btn-primary" href="pages/post.html?id=${encodeURIComponent(post.id)}">Read the Post →</a>
+                <a class="btn btn-primary" href="/post?id=${encodeURIComponent(post.id)}">Read the Post →</a>
               </div>
             </article>
           `;

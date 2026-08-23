@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     mount.innerHTML = `
       <div class="blog-empty">
         <p style="margin-bottom: 18px;">We couldn't find that post — it may have been removed or the link is out of date.</p>
-        <a href="blog.html" class="btn btn-primary">← Back to the Blog</a>
+        <a href="/blog" class="btn btn-primary">← Back to the Blog</a>
       </div>
     `;
     return;
@@ -57,8 +57,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   mount.innerHTML = `
     <div class="breadcrumb">
-      <a href="../index.html">Home</a><span>/</span>
-      <a href="blog.html">Blog</a><span>/</span>
+      <a href="/">Home</a><span>/</span>
+      <a href="/blog">Blog</a><span>/</span>
       <strong>${Fikrah.escapeHTML(post.title)}</strong>
     </div>
 
@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     <div class="post-body">${paragraphs}</div>
 
     <div class="hero-actions" style="margin-top: 20px;">
-      <a href="blog.html" class="btn btn-secondary">← Back to the Blog</a>
+      <a href="/blog" class="btn btn-secondary">← Back to the Blog</a>
     </div>
   `;
 });
