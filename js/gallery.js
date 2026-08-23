@@ -40,6 +40,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       grid.innerHTML = list.length
         ? list.map((item, i) => itemHTML(item, i)).join("")
         : '<div class="member-empty" style="display:block;">No images yet — add some from the content manager.</div>';
+      Fikrah.observeReveals(grid);
     }
 
     if (filterBar) {
@@ -72,6 +73,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (teaser) {
     const items = (await CMS.getGallery()).slice(0, 5);
     teaser.innerHTML = items.map((item, i) => itemHTML(item, i)).join("");
+    Fikrah.observeReveals(teaser);
   }
 
 });

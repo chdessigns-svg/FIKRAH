@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       grid.innerHTML = list.length
         ? list.map(v => CMS.videoCardHTML(v)).join("")
         : '<div class="member-empty" style="display:block;">No videos yet — add some from the content manager.</div>';
+      Fikrah.observeReveals(grid);
     }
 
     if (filterBar) {
@@ -66,6 +67,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     teaser.innerHTML = items.length
       ? items.map(v => CMS.videoCardHTML(v)).join("")
       : '<div class="member-empty" style="display:block;">No videos yet.</div>';
+    Fikrah.observeReveals(teaser);
   }
 
 });

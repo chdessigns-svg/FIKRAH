@@ -22,6 +22,44 @@ window.showToast = function showToast(message) {
   }, 3500);
 };
 
+/* -----------------------------------------------------------
+   SCROLL REVEAL
+   Exposed as Fikrah.observeReveals(root) so content added
+   later by async CMS-driven modules (blog/gallery/videos) can
+   hook their newly-inserted .reveal elements into the same
+   observer used for content that was already on the page at
+   load — otherwise anything rendered after the initial pass
+   stays stuck at opacity:0 forever.
+   ----------------------------------------------------------- */
+
+window.Fikrah = window.Fikrah || {};
+
+var __fikrahRevealObserver = window.IntersectionObserver
+  ? new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            __fikrahRevealObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    )
+  : null;
+
+window.Fikrah.observeReveals = function observeReveals(root) {
+  const elements = (root || document).querySelectorAll(".reveal:not(.visible)");
+
+  if (!__fikrahRevealObserver) {
+    // No IntersectionObserver support — just show everything immediately.
+    elements.forEach(el => el.classList.add("visible"));
+    return;
+  }
+
+  elements.forEach(el => __fikrahRevealObserver.observe(el));
+};
+
 document.addEventListener("DOMContentLoaded", () => {
 
   /* -------------------------------------------------------
@@ -142,30 +180,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* -------------------------------------------------------
      SCROLL REVEAL
+     (elements already on the page at load — anything added
+     later by async CMS modules calls Fikrah.observeReveals()
+     itself after rendering)
      ------------------------------------------------------- */
 
-  const revealElements = document.querySelectorAll(".reveal");
-
-  if (!window.IntersectionObserver) {
-    // Fallback for the rare environment without IntersectionObserver:
-    // just show everything immediately instead of leaving it hidden.
-    revealElements.forEach(el => el.classList.add("visible"));
-  } else {
-
-    const revealObserver = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
-            revealObserver.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.12 }
-    );
-
-    revealElements.forEach(element => revealObserver.observe(element));
-  }
+  Fikrah.observeReveals();
 
 
   /* -------------------------------------------------------

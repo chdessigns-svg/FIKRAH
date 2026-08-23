@@ -56,6 +56,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (empty) {
         empty.style.display = list.length ? "none" : "block";
       }
+      Fikrah.observeReveals(grid);
     }
 
     if (filterBar) {
@@ -91,6 +92,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     teaser.innerHTML = latest.length
       ? latest.map(post => cardHTML(post, "pages/")).join("")
       : '<div class="blog-empty">No posts yet — add one from the content manager.</div>';
+    Fikrah.observeReveals(teaser);
   }
 
 });
