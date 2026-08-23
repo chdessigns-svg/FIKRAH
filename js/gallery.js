@@ -4,7 +4,7 @@
    and the homepage teaser, from CMS.getGallery().
    ========================================================= */
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
 
   if (!window.CMS) {
     return;
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (grid) {
 
-    const items = CMS.getGallery();
+    const items = await CMS.getGallery();
     const filterBar = document.getElementById("galleryFilters");
     const categories = Array.from(new Set(items.map(i => i.category).filter(Boolean)));
 
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const teaser = document.getElementById("galleryTeaser");
 
   if (teaser) {
-    const items = CMS.getGallery().slice(0, 5);
+    const items = (await CMS.getGallery()).slice(0, 5);
     teaser.innerHTML = items.map((item, i) => itemHTML(item, i)).join("");
   }
 

@@ -25,23 +25,27 @@
       <span class="logo-mark">F</span>
       <h1 class="section-title" style="font-size: 1.6rem;">Content Manager</h1>
       <p>
-        Manage blog posts (which also power the homepage slider) and
-        gallery images for Fikrah Summit. This is a lightweight,
-        browser-only editor — see the note at the bottom of the page
-        for how it works.
+        Manage blog posts (which also power the homepage slider),
+        gallery images and videos for Fikrah Summit. Sign in with
+        the admin account to make changes live for every visitor.
       </p>
 
       <form id="adminGateForm">
         <div class="form-group">
-          <label for="adminPassword">Access Code</label>
-          <input class="form-control" id="adminPassword" type="password" placeholder="Enter access code" required autofocus />
+          <label for="adminEmail">Email</label>
+          <input class="form-control" id="adminEmail" type="email" placeholder="you@fikrahsummit.com" required autofocus />
+        </div>
+
+        <div class="form-group">
+          <label for="adminPassword">Password</label>
+          <input class="form-control" id="adminPassword" type="password" placeholder="Password" required />
         </div>
 
         <p id="adminGateError" style="display:none; color:#c0392b; font-size:0.8rem; margin-bottom: 14px;">
-          That access code isn't right — try again.
+          Couldn't sign in — check the email and password and try again.
         </p>
 
-        <button type="submit" class="btn btn-primary" style="width:100%;">Enter →</button>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Sign In →</button>
       </form>
     </div>
   </div>
@@ -141,35 +145,6 @@
             </table>
           </div>
         </section>
-
-        <!-- DATA TOOLS -->
-        <div class="admin-card" style="margin-top: 30px;">
-          <div class="admin-toolbar" style="margin-bottom: 10px;">
-            <h2 style="font-size: 1.2rem;">Backup &amp; Sync</h2>
-          </div>
-
-          <div class="admin-actions">
-            <button class="admin-btn primary" id="exportBtn">⬇ Export All Content (JSON)</button>
-            <button class="admin-btn" id="importBtn">⬆ Import Content File</button>
-            <input type="file" id="importInput" class="admin-import-input" accept="application/json" />
-            <button class="admin-btn danger" id="resetBtn">Reset to Defaults</button>
-          </div>
-
-          <div class="admin-note">
-            <strong>How this works</strong>
-            Everything you add here is saved in this browser only (not on a
-            server). To make your edits appear for real site visitors,
-            click <strong>Export All Content</strong> and send the
-            downloaded <code>fikrah-content-export.json</code> file to
-            whoever deploys the site, so it can replace
-            <code>data/content-seed.json</code>. Use <strong>Import Content
-            File</strong> to load that file back in on any browser —
-            handy for editing on a different computer, or for sharing
-            drafts with a teammate. Uploaded photos are stored directly
-            in this export file, so large or many photos can make it a
-            big file — compress images before uploading where you can.
-          </div>
-        </div>
 
       </div>
     </div>
@@ -281,6 +256,8 @@
   <div class="toast" id="toast"></div>
 
   <script src="../js/app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
   <script src="../js/cms.js"></script>
   <script src="../js/admin.js"></script>
 

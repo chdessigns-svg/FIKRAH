@@ -10,20 +10,11 @@
    when a visitor actually chooses to watch.
    ========================================================= */
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
 
   if (!window.CMS) {
     return;
   }
-
-  // If videos are added/edited in the admin panel in another tab on this
-  // same browser, refresh this page so the change shows up without
-  // needing a manual reload.
-  window.addEventListener("storage", event => {
-    if (event.key === CMS.KEYS.videos) {
-      location.reload();
-    }
-  });
 
   /* -------------------------------------------------------
      FULL VIDEOS PAGE (pages/videos.html)
@@ -33,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (grid) {
 
-    const items = CMS.getVideos();
+    const items = await CMS.getVideos();
     const filterBar = document.getElementById("videoFilters");
     const categories = Array.from(new Set(items.map(v => v.category).filter(Boolean)));
 
@@ -71,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const teaser = document.getElementById("videoTeaser");
 
   if (teaser) {
-    const items = CMS.getVideos().slice(0, 3);
+    const items = (await CMS.getVideos()).slice(0, 3);
     teaser.innerHTML = items.length
       ? items.map(v => CMS.videoCardHTML(v)).join("")
       : '<div class="member-empty" style="display:block;">No videos yet.</div>';

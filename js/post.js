@@ -4,7 +4,7 @@
    on the ?id= query parameter, from CMS.getPost().
    ========================================================= */
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
 
   const mount = document.getElementById("postMount");
 
@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const params = new URLSearchParams(window.location.search);
   const id = params.get("id");
-  const post = id ? CMS.getPost(id) : null;
+  const post = id ? await CMS.getPost(id) : null;
 
   if (!post) {
     mount.innerHTML = `

@@ -4,7 +4,7 @@
    "latest posts" teaser on index.html, from CMS.getPosts().
    ========================================================= */
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
 
   if (!window.CMS) {
     return;
@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (grid) {
 
-    const posts = CMS.getPosts();
+    const posts = await CMS.getPosts();
     const filterBar = document.getElementById("blogFilters");
     const empty = document.getElementById("blogEmpty");
 
@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const teaser = document.getElementById("blogTeaser");
 
   if (teaser) {
-    const latest = CMS.getPosts().slice(0, 3);
+    const latest = (await CMS.getPosts()).slice(0, 3);
 
     teaser.innerHTML = latest.length
       ? latest.map(post => cardHTML(post, "pages/")).join("")

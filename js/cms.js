@@ -1,133 +1,97 @@
 /* =========================================================
-   FIKRAH SUMMIT — LIGHTWEIGHT CMS
+   FIKRAH SUMMIT — CMS (Supabase-backed)
    js/cms.js
 
-   A client-side content layer backed by localStorage.
-   Manages two collections — posts and gallery — used by the
-   homepage slider (built from the latest posts), the blog
-   pages and the gallery page. Edited from admin/index.html.
+   A thin wrapper around the Supabase JS client. Manages three
+   tables — posts, gallery, videos — used by the homepage
+   slider (built from the latest posts), the blog pages, the
+   gallery page and the Videos page. Edited from admin/index.html.
 
-   NOTE: localStorage is per-browser, not a server database.
-   Content added in the admin panel is only visible on the
-   same browser/device unless exported and imported elsewhere.
-   Use the Export/Import buttons in the admin panel to move
-   content between machines, or wire this layer up to a real
-   backend (WordPress REST API, headless CMS, custom API)
-   when the site is ready for one.
+   Content lives in a real Postgres database (see
+   supabase/schema.sql), so anything added in the admin panel
+   is immediately visible to every visitor, on any device —
+   unlike the old browser-only localStorage version.
+
+   Requires js/supabase-config.js (SUPABASE_URL /
+   SUPABASE_ANON_KEY) and the Supabase JS CDN script to be
+   loaded before this file.
    ========================================================= */
 
 (function (global) {
 
-  const KEYS = {
-    posts: "fikrah_cms_posts",
-    gallery: "fikrah_cms_gallery",
-    videos: "fikrah_cms_videos",
-  };
-
   const GRADIENT_VARIANTS = 5;
 
-  function uid(prefix) {
-    return (
-      prefix +
-      "_" +
-      Date.now().toString(36) +
-      Math.random().toString(36).slice(2, 7)
-    );
+  let supabaseClient = null;
+
+  if (global.SUPABASE_URL && global.SUPABASE_ANON_KEY && global.supabase) {
+    supabaseClient = global.supabase.createClient(global.SUPABASE_URL, global.SUPABASE_ANON_KEY);
+  } else {
+    console.warn("Supabase isn't configured yet — fill in js/supabase-config.js. Content will show as empty until then.");
   }
 
-  function read(key, fallback) {
-    try {
-      const raw = localStorage.getItem(key);
-      if (!raw) return fallback;
-      const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed : fallback;
-    } catch (err) {
-      console.warn("CMS read failed for", key, err);
-      return fallback;
+  function requireClient() {
+    if (!supabaseClient) {
+      throw new Error("Supabase isn't configured yet — see js/supabase-config.js.");
     }
+    return supabaseClient;
   }
 
-  function write(key, list) {
-    try {
-      localStorage.setItem(key, JSON.stringify(list));
-      return true;
-    } catch (err) {
-      console.warn("CMS write failed for", key, err);
-      return false;
-    }
+  function ok(result) {
+    if (result.error) throw new Error(result.error.message);
+    return result;
   }
 
   /* -------------------------------------------------------
-     DEFAULT / SEED CONTENT
+     ROW <-> APP OBJECT MAPPING
+     (the DB uses snake_case for the couple of fields that
+     differ from the camelCase names used across the site)
      ------------------------------------------------------- */
 
-  const DEFAULT_POSTS = [
-    {
-      id: "post_1",
-      title: "Recap: The 104th Session at Adil Conference Center",
-      excerpt:
-        "Chaired by Eng. Nassor Morsady Hassan, Session 104 explored how disciplined presentation turns good ideas into decisions people act on.",
-      body:
-        "Fikrah Summit's 104th session opened with a review of the community's growth since its early days as DOUBLE G, before moving into the evening's core theme: the power of presentation as a leadership skill.\n\nMembers practiced structuring an argument, reading a room and closing with a clear call to action. As with every Fikrah session, the evening balanced formal learning with open networking, giving entrepreneurs, students and executives space to exchange contacts and ideas outside the structured programme.\n\nThe session closed with a short Q&A and an invitation for members to propose topics for upcoming sessions.",
-      category: "Session Recap",
-      date: "2026-07-11",
-      author: "Fikrah Summit",
-      image: "",
-    },
-    {
-      id: "post_2",
-      title: "Why We Renamed DOUBLE G to Fikrah Summit",
-      excerpt:
-        "A short look at the philosophy behind the community's evolution — and what stays the same.",
-      body:
-        "Originally founded as DOUBLE G (Givers Gain), our community evolved into Fikrah Summit with a renewed philosophy and a stronger focus on leadership, entrepreneurship, business excellence and lifelong learning.\n\nThe name change reflected something deeper than branding: a shift toward structured, weekly learning built around real speakers, real case studies and real accountability between members.\n\nWhat hasn't changed is the belief that gathering ambitious people in one room, consistently, compounds into something bigger than any single session.",
-      category: "Community",
-      date: "2026-05-02",
-      author: "Fikrah Summit",
-      image: "",
-    },
-    {
-      id: "post_3",
-      title: "Five Takeaways from Prof. Mussa J. Assad on Academic Leadership",
-      excerpt:
-        "Notes from Session 61, where the Vice Chancellor of Muslim University of Morogoro joined Fikrah for a conversation on leading institutions.",
-      body:
-        "When Prof. Mussa J. Assad, Vice Chancellor of Muslim University of Morogoro, joined Fikrah Summit for Session 61, the room filled quickly.\n\nHis talk moved between academic governance and everyday leadership — the discipline of listening before deciding, the cost of avoiding hard conversations, and why institutions (like communities) grow only as fast as the trust inside them.\n\nMembers left with a simple challenge: apply one habit from academic leadership to their own business or team this month.",
-      category: "Session Recap",
-      date: "2026-02-14",
-      author: "Fikrah Summit",
-      image: "",
-    },
-  ];
-
-  const DEFAULT_GALLERY = [
-    { id: "g1", caption: "People. Ideas. Connections.", small: "Fikrah Summit", category: "Community", image: "" },
-    { id: "g2", caption: "Learning together", small: "Session", category: "Sessions", image: "" },
-    { id: "g3", caption: "Networking", small: "Community", category: "Community", image: "" },
-    { id: "g4", caption: "Sharing experience", small: "Speaker", category: "Speakers", image: "" },
-    { id: "g5", caption: "Creating impact", small: "Highlights", category: "Sessions", image: "" },
-    { id: "g6", caption: "Adil Conference Center", small: "Session 104", category: "Sessions", image: "" },
-    { id: "g7", caption: "Opening remarks", small: "Chairman's Address", category: "Speakers", image: "" },
-    { id: "g8", caption: "Open floor discussion", small: "Q&amp;A", category: "Community", image: "" },
-    { id: "g9", caption: "Group photo", small: "Closing", category: "Community", image: "" },
-  ];
-
-  const DEFAULT_VIDEOS = [
-    {
-      id: "v1",
-      title: "Fikrah Summit — Session Highlights",
-      youtubeId: "58vNS3C0Jds",
-      category: "Sessions",
-    },
-  ];
-
-  function seedIfEmpty() {
-    if (!localStorage.getItem(KEYS.posts)) write(KEYS.posts, DEFAULT_POSTS);
-    if (!localStorage.getItem(KEYS.gallery)) write(KEYS.gallery, DEFAULT_GALLERY);
-    if (!localStorage.getItem(KEYS.videos)) write(KEYS.videos, DEFAULT_VIDEOS);
+  function postFromRow(row) {
+    if (!row) return null;
+    return {
+      id: row.id,
+      title: row.title,
+      excerpt: row.excerpt,
+      body: row.body,
+      category: row.category,
+      date: row.date,
+      author: row.author,
+      image: row.image,
+      videoId: row.video_id,
+    };
   }
 
-  seedIfEmpty();
+  function postToRow(post) {
+    return {
+      title: post.title || "",
+      excerpt: post.excerpt || "",
+      body: post.body || "",
+      category: post.category || "",
+      date: post.date || null,
+      author: post.author || "",
+      image: post.image || "",
+      video_id: post.videoId || null,
+    };
+  }
+
+  function videoFromRow(row) {
+    if (!row) return null;
+    return {
+      id: row.id,
+      title: row.title,
+      category: row.category,
+      youtubeId: row.youtube_id,
+    };
+  }
+
+  function videoToRow(video) {
+    return {
+      title: video.title || "",
+      category: video.category || "",
+      youtube_id: video.youtubeId,
+    };
+  }
 
   /* -------------------------------------------------------
      PUBLIC API
@@ -135,93 +99,138 @@
 
   const CMS = {
 
-    KEYS,
     GRADIENT_VARIANTS,
-
-    getPosts() {
-      return read(KEYS.posts, DEFAULT_POSTS).sort((a, b) =>
-        (b.date || "").localeCompare(a.date || "")
-      );
-    },
-    savePosts(list) {
-      return write(KEYS.posts, list);
-    },
-    getPost(id) {
-      return this.getPosts().find(p => p.id === id) || null;
-    },
-    getFeaturedPosts(limit) {
-      // Used by the homepage slider — the slider is simply the
-      // latest posts, so there is nothing separate to manage.
-      return this.getPosts().slice(0, limit || 5);
-    },
-    addPost(post) {
-      const list = read(KEYS.posts, DEFAULT_POSTS);
-      list.unshift(Object.assign({ id: uid("post") }, post));
-      return write(KEYS.posts, list);
-    },
-    updatePost(id, patch) {
-      const list = read(KEYS.posts, DEFAULT_POSTS);
-      const idx = list.findIndex(p => p.id === id);
-      if (idx > -1) {
-        list[idx] = Object.assign({}, list[idx], patch);
-        return write(KEYS.posts, list);
-      }
-      return false;
-    },
-    deletePost(id) {
-      const list = read(KEYS.posts, DEFAULT_POSTS).filter(p => p.id !== id);
-      return write(KEYS.posts, list);
+    isConfigured() {
+      return !!supabaseClient;
     },
 
-    getGallery() {
-      return read(KEYS.gallery, DEFAULT_GALLERY);
+    /* ---- AUTH (admin login) ---- */
+
+    async signIn(email, password) {
+      const client = requireClient();
+      const { error } = await client.auth.signInWithPassword({ email, password });
+      if (error) throw new Error(error.message);
     },
-    saveGallery(list) {
-      return write(KEYS.gallery, list);
+    async signOut() {
+      if (!supabaseClient) return;
+      await supabaseClient.auth.signOut();
     },
-    addImage(item) {
-      const list = read(KEYS.gallery, DEFAULT_GALLERY);
-      list.unshift(Object.assign({ id: uid("img") }, item));
-      return write(KEYS.gallery, list);
+    async getSession() {
+      if (!supabaseClient) return null;
+      const { data } = await supabaseClient.auth.getSession();
+      return data.session;
     },
-    updateImage(id, patch) {
-      const list = read(KEYS.gallery, DEFAULT_GALLERY);
-      const idx = list.findIndex(g => g.id === id);
-      if (idx > -1) {
-        list[idx] = Object.assign({}, list[idx], patch);
-        return write(KEYS.gallery, list);
-      }
-      return false;
-    },
-    deleteImage(id) {
-      const list = read(KEYS.gallery, DEFAULT_GALLERY).filter(g => g.id !== id);
-      return write(KEYS.gallery, list);
+    onAuthChange(callback) {
+      if (!supabaseClient) return;
+      supabaseClient.auth.onAuthStateChange((_event, session) => callback(session));
     },
 
-    getVideos() {
-      return read(KEYS.videos, DEFAULT_VIDEOS);
+    /* ---- PHOTO UPLOAD (Supabase Storage, bucket "media") ---- */
+
+    async uploadPhoto(file) {
+      const client = requireClient();
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+      const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+      const uploadResult = await client.storage.from("media").upload(path, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+      if (uploadResult.error) throw new Error(uploadResult.error.message);
+
+      const { data } = client.storage.from("media").getPublicUrl(path);
+      return data.publicUrl;
     },
-    saveVideos(list) {
-      return write(KEYS.videos, list);
+
+    /* ---- POSTS ---- */
+
+    async getPosts() {
+      if (!supabaseClient) return [];
+      const result = ok(await supabaseClient
+        .from("posts")
+        .select("*")
+        .order("date", { ascending: false, nullsFirst: false })
+        .order("created_at", { ascending: false }));
+      return result.data.map(postFromRow);
     },
-    addVideo(video) {
-      const list = read(KEYS.videos, DEFAULT_VIDEOS);
-      list.unshift(Object.assign({ id: uid("vid") }, video));
-      return write(KEYS.videos, list);
+    async getPost(id) {
+      if (!supabaseClient) return null;
+      const result = ok(await supabaseClient.from("posts").select("*").eq("id", id).maybeSingle());
+      return postFromRow(result.data);
     },
-    updateVideo(id, patch) {
-      const list = read(KEYS.videos, DEFAULT_VIDEOS);
-      const idx = list.findIndex(v => v.id === id);
-      if (idx > -1) {
-        list[idx] = Object.assign({}, list[idx], patch);
-        return write(KEYS.videos, list);
-      }
-      return false;
+    async getFeaturedPosts(limit) {
+      const posts = await this.getPosts();
+      return posts.slice(0, limit || 5);
     },
-    deleteVideo(id) {
-      const list = read(KEYS.videos, DEFAULT_VIDEOS).filter(v => v.id !== id);
-      return write(KEYS.videos, list);
+    async addPost(post) {
+      const client = requireClient();
+      ok(await client.from("posts").insert(postToRow(post)));
     },
+    async updatePost(id, patch) {
+      const client = requireClient();
+      const current = await this.getPost(id);
+      ok(await client.from("posts").update(postToRow(Object.assign({}, current, patch))).eq("id", id));
+    },
+    async deletePost(id) {
+      const client = requireClient();
+      ok(await client.from("posts").delete().eq("id", id));
+    },
+
+    /* ---- GALLERY ---- */
+
+    async getGallery() {
+      if (!supabaseClient) return [];
+      const result = ok(await supabaseClient.from("gallery").select("*").order("created_at", { ascending: false }));
+      return result.data;
+    },
+    async addImage(item) {
+      const client = requireClient();
+      ok(await client.from("gallery").insert({
+        caption: item.caption || "",
+        small: item.small || "",
+        category: item.category || "",
+        image: item.image || "",
+      }));
+    },
+    async updateImage(id, patch) {
+      const client = requireClient();
+      const row = {};
+      if ("caption" in patch) row.caption = patch.caption;
+      if ("small" in patch) row.small = patch.small;
+      if ("category" in patch) row.category = patch.category;
+      if ("image" in patch) row.image = patch.image;
+      ok(await client.from("gallery").update(row).eq("id", id));
+    },
+    async deleteImage(id) {
+      const client = requireClient();
+      ok(await client.from("gallery").delete().eq("id", id));
+    },
+
+    /* ---- VIDEOS ---- */
+
+    async getVideos() {
+      if (!supabaseClient) return [];
+      const result = ok(await supabaseClient.from("videos").select("*").order("created_at", { ascending: false }));
+      return result.data.map(videoFromRow);
+    },
+    async addVideo(video) {
+      const client = requireClient();
+      ok(await client.from("videos").insert(videoToRow(video)));
+    },
+    async updateVideo(id, patch) {
+      const client = requireClient();
+      const row = {};
+      if ("title" in patch) row.title = patch.title;
+      if ("category" in patch) row.category = patch.category;
+      if ("youtubeId" in patch) row.youtube_id = patch.youtubeId;
+      ok(await client.from("videos").update(row).eq("id", id));
+    },
+    async deleteVideo(id) {
+      const client = requireClient();
+      ok(await client.from("videos").delete().eq("id", id));
+    },
+
+    /* ---- YOUTUBE HELPERS ---- */
 
     // Accepts a full YouTube URL (watch, youtu.be, shorts or embed) or a
     // bare 11-character video ID, and returns just the ID (or "" if the
@@ -276,30 +285,6 @@
           </div>
         </article>
       `;
-    },
-
-    resetAll() {
-      write(KEYS.posts, DEFAULT_POSTS);
-      write(KEYS.gallery, DEFAULT_GALLERY);
-      write(KEYS.videos, DEFAULT_VIDEOS);
-    },
-
-    exportAll() {
-      return JSON.stringify(
-        {
-          posts: read(KEYS.posts, DEFAULT_POSTS),
-          gallery: read(KEYS.gallery, DEFAULT_GALLERY),
-          videos: read(KEYS.videos, DEFAULT_VIDEOS),
-        },
-        null,
-        2
-      );
-    },
-    importAll(json) {
-      const data = JSON.parse(json);
-      if (Array.isArray(data.posts)) write(KEYS.posts, data.posts);
-      if (Array.isArray(data.gallery)) write(KEYS.gallery, data.gallery);
-      if (Array.isArray(data.videos)) write(KEYS.videos, data.videos);
     },
 
     formatDate(iso) {

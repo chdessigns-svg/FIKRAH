@@ -1,24 +1,15 @@
 /* =========================================================
    FIKRAH SUMMIT
    admin.js — content manager logic for admin/index.html.
-   Talks only to the CMS object defined in js/cms.js.
-
-   SECURITY NOTE: the password gate below is a convenience
-   screen, not real authentication — the "password" lives in
-   this file, in plain text, on the client. It stops casual
-   visitors from poking at the panel; it does not stop anyone
-   who reads the page source. Do not use this to protect
-   anything sensitive. For a real multi-user CMS with proper
-   login, this admin panel would need to be replaced with a
-   server-backed one.
+   Talks only to the CMS object defined in js/cms.js, which
+   talks to Supabase. Sign-in uses real Supabase Auth, so only
+   whoever has the admin account's email/password can save
+   changes — everyone else can still read the public site.
    ========================================================= */
 
 (function () {
 
-  const ADMIN_PASSWORD = "fikrah2026";
-  const SESSION_KEY = "fikrah_admin_session";
-
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", async () => {
 
     const gate = document.getElementById("adminGate");
     const shell = document.getElementById("adminShell");
@@ -26,35 +17,62 @@
     const gateError = document.getElementById("adminGateError");
     const logoutBtn = document.getElementById("adminLogout");
 
-    function unlock() {
+    if (!window.CMS || !CMS.isConfigured()) {
+      gate.innerHTML = `
+        <div class="admin-gate-card">
+          <span class="logo-mark">F</span>
+          <h1 class="section-title" style="font-size: 1.6rem;">Content Manager</h1>
+          <p>
+            Supabase isn't configured yet. Fill in
+            <code>js/supabase-config.js</code> with your project's URL
+            and anon key, then reload this page.
+          </p>
+        </div>
+      `;
+      return;
+    }
+
+    async function unlock() {
       gate.style.display = "none";
       shell.style.display = "block";
-      renderAll();
+      await renderAll();
     }
 
-    if (sessionStorage.getItem(SESSION_KEY) === "true") {
-      unlock();
+    function showGate() {
+      shell.style.display = "none";
+      gate.style.display = "grid";
     }
 
-    gateForm.addEventListener("submit", event => {
+    const session = await CMS.getSession();
+    if (session) {
+      await unlock();
+    }
+
+    gateForm.addEventListener("submit", async event => {
       event.preventDefault();
-      const input = document.getElementById("adminPassword").value;
+      const email = document.getElementById("adminEmail").value;
+      const password = document.getElementById("adminPassword").value;
+      const submitBtn = gateForm.querySelector("button[type=submit]");
 
-      if (input === ADMIN_PASSWORD) {
-        sessionStorage.setItem(SESSION_KEY, "true");
-        gateError.style.display = "none";
-        unlock();
-      } else {
+      gateError.style.display = "none";
+      submitBtn.disabled = true;
+
+      try {
+        await CMS.signIn(email, password);
+        await unlock();
+      } catch (err) {
+        gateError.textContent = err.message || "Couldn't sign in — check the email and password and try again.";
         gateError.style.display = "block";
+      } finally {
+        submitBtn.disabled = false;
       }
     });
 
     if (logoutBtn) {
-      logoutBtn.addEventListener("click", () => {
-        sessionStorage.removeItem(SESSION_KEY);
-        shell.style.display = "none";
-        gate.style.display = "grid";
+      logoutBtn.addEventListener("click", async () => {
+        await CMS.signOut();
         gateForm.reset();
+        showGate();
       });
     }
 
@@ -76,7 +94,7 @@
     });
 
     /* -----------------------------------------------------
-       MODAL FORM (shared by slides / posts / gallery)
+       MODAL FORM (shared by posts / gallery / videos)
        ----------------------------------------------------- */
 
     const modal = document.getElementById("entryModal");
@@ -97,9 +115,9 @@
     const imagePreview = document.getElementById("f-imagePreview");
     const imageHiddenInput = document.getElementById("f-image");
 
-    function setPreview(dataUrlOrEmpty) {
-      if (dataUrlOrEmpty) {
-        imagePreview.src = dataUrlOrEmpty;
+    function setPreview(urlOrEmpty) {
+      if (urlOrEmpty) {
+        imagePreview.src = urlOrEmpty;
         imagePreview.style.display = "block";
       } else {
         imagePreview.removeAttribute("src");
@@ -108,7 +126,7 @@
     }
 
     if (imageFileInput) {
-      imageFileInput.addEventListener("change", () => {
+      imageFileInput.addEventListener("change", async () => {
         const file = imageFileInput.files[0];
         if (!file) return;
 
@@ -118,22 +136,25 @@
           return;
         }
 
-        if (file.size > 3 * 1024 * 1024) {
-          alert("That photo is quite large (over 3MB) and may not fit in this browser's storage. A smaller, compressed photo works best.");
+        if (file.size > 8 * 1024 * 1024) {
+          alert("That photo is quite large (over 8MB). A smaller, compressed photo uploads faster.");
         }
 
-        const reader = new FileReader();
-
-        reader.onload = () => {
-          imageHiddenInput.value = reader.result;
-          setPreview(reader.result);
-        };
-
-        reader.readAsDataURL(file);
+        try {
+          imageFileInput.disabled = true;
+          const url = await CMS.uploadPhoto(file);
+          imageHiddenInput.value = url;
+          setPreview(url);
+        } catch (err) {
+          alert("Couldn't upload that photo: " + err.message);
+          imageFileInput.value = "";
+        } finally {
+          imageFileInput.disabled = false;
+        }
       });
     }
 
-    function openModal(type, id) {
+    function openModal(type, id, record) {
       currentType = type;
       currentId = id;
 
@@ -144,31 +165,23 @@
       const labels = { post: "Post", gallery: "Image", video: "Video" };
       modalTitle.textContent = (id ? "Edit " : "Add ") + labels[type];
 
-      if (id) {
-        let record = null;
+      if (record) {
+        Object.keys(record).forEach(key => {
+          // The gallery/video/post forms each use their own field name
+          // for a couple of fields to avoid colliding with each other,
+          // since all three share one modal.
+          let fieldName = key;
+          if (type === "gallery" && key === "category") fieldName = "galleryCategory";
+          if (type === "video" && key === "category") fieldName = "videoCategory";
+          if (type === "video" && key === "youtubeId") fieldName = "videoUrl";
+          if (type === "post" && key === "videoId") fieldName = "postVideoUrl";
 
-        if (type === "post") record = CMS.getPosts().find(p => p.id === id);
-        if (type === "gallery") record = CMS.getGallery().find(g => g.id === id);
-        if (type === "video") record = CMS.getVideos().find(v => v.id === id);
+          const field = modalForm.elements[fieldName];
+          if (field) field.value = record[key] || "";
+        });
 
-        if (record) {
-          Object.keys(record).forEach(key => {
-            // The gallery/video forms each reuse their own "category"
-            // field name to avoid colliding with the post form's
-            // "category" field, since all three share one modal.
-            let fieldName = key;
-            if (type === "gallery" && key === "category") fieldName = "galleryCategory";
-            if (type === "video" && key === "category") fieldName = "videoCategory";
-            if (type === "video" && key === "youtubeId") fieldName = "videoUrl";
-            if (type === "post" && key === "videoId") fieldName = "postVideoUrl";
-
-            const field = modalForm.elements[fieldName];
-            if (field) field.value = record[key];
-          });
-
-          if (record.image) {
-            setPreview(record.image);
-          }
+        if (record.image) {
+          setPreview(record.image);
         }
       }
 
@@ -186,56 +199,56 @@
     closeModalBtn.addEventListener("click", closeModal);
     modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
 
-    modalForm.addEventListener("submit", event => {
+    modalForm.addEventListener("submit", async event => {
       event.preventDefault();
 
       const data = Object.fromEntries(new FormData(modalForm).entries());
-      let saved = false;
+      const submitBtn = modalForm.querySelector("button[type=submit]");
+      submitBtn.disabled = true;
 
-      if (currentType === "post") {
-        if (data.postVideoUrl) {
-          const videoId = CMS.extractYouTubeId(data.postVideoUrl);
+      try {
+        if (currentType === "post") {
+          if (data.postVideoUrl) {
+            const videoId = CMS.extractYouTubeId(data.postVideoUrl);
+            if (!videoId) {
+              alert("That video link doesn't look right — check it and try again, or leave the video field blank.");
+              return;
+            }
+            data.videoId = videoId;
+          } else {
+            data.videoId = "";
+          }
+          delete data.postVideoUrl;
 
-          if (!videoId) {
-            alert("That video link doesn't look right — check it and try again, or leave the video field blank.");
+          currentId ? await CMS.updatePost(currentId, data) : await CMS.addPost(data);
+        }
+
+        if (currentType === "gallery") {
+          data.category = data.galleryCategory;
+          delete data.galleryCategory;
+          currentId ? await CMS.updateImage(currentId, data) : await CMS.addImage(data);
+        }
+
+        if (currentType === "video") {
+          const youtubeId = CMS.extractYouTubeId(data.videoUrl);
+
+          if (!youtubeId) {
+            alert("That doesn't look like a valid YouTube link or video ID. Please check it and try again.");
             return;
           }
 
-          data.videoId = videoId;
-        } else {
-          data.videoId = "";
-        }
-        delete data.postVideoUrl;
-
-        saved = currentId ? CMS.updatePost(currentId, data) : CMS.addPost(data);
-      }
-
-      if (currentType === "gallery") {
-        data.category = data.galleryCategory;
-        delete data.galleryCategory;
-        saved = currentId ? CMS.updateImage(currentId, data) : CMS.addImage(data);
-      }
-
-      if (currentType === "video") {
-        const youtubeId = CMS.extractYouTubeId(data.videoUrl);
-
-        if (!youtubeId) {
-          alert("That doesn't look like a valid YouTube link or video ID. Please check it and try again.");
-          return;
+          const video = { title: data.title, category: data.videoCategory, youtubeId };
+          currentId ? await CMS.updateVideo(currentId, video) : await CMS.addVideo(video);
         }
 
-        const video = { title: data.title, category: data.videoCategory, youtubeId };
-        saved = currentId ? CMS.updateVideo(currentId, video) : CMS.addVideo(video);
+        closeModal();
+        await renderAll();
+        Fikrah.showToastIfPresent("Saved.");
+      } catch (err) {
+        alert("Couldn't save this: " + err.message);
+      } finally {
+        submitBtn.disabled = false;
       }
-
-      if (!saved) {
-        alert("Couldn't save this — this browser's storage is full (likely from earlier photo uploads). Try removing an old photo, or compress it before uploading, then try again.");
-        return;
-      }
-
-      closeModal();
-      renderAll();
-      Fikrah.showToastIfPresent("Saved.");
     });
 
     /* -----------------------------------------------------
@@ -243,18 +256,22 @@
        ----------------------------------------------------- */
 
     document.querySelectorAll("[data-add]").forEach(btn => {
-      btn.addEventListener("click", () => openModal(btn.dataset.add, null));
+      btn.addEventListener("click", () => openModal(btn.dataset.add, null, null));
     });
 
     /* -----------------------------------------------------
        RENDER TABLES
        ----------------------------------------------------- */
 
-    function renderPosts() {
-      const tbody = document.getElementById("postsTable");
-      const posts = CMS.getPosts();
+    let postsCache = [];
+    let galleryCache = [];
+    let videosCache = [];
 
-      tbody.innerHTML = posts.length ? posts.map(p => `
+    async function renderPosts() {
+      const tbody = document.getElementById("postsTable");
+      postsCache = await CMS.getPosts();
+
+      tbody.innerHTML = postsCache.length ? postsCache.map(p => `
         <tr>
           <td>
             <div class="row-title">${Fikrah.escapeHTML(p.title || "")}</div>
@@ -273,11 +290,11 @@
       `).join("") : `<tr class="admin-empty-row"><td colspan="4">No posts yet.</td></tr>`;
     }
 
-    function renderGallery() {
+    async function renderGallery() {
       const tbody = document.getElementById("galleryTable");
-      const items = CMS.getGallery();
+      galleryCache = await CMS.getGallery();
 
-      tbody.innerHTML = items.length ? items.map(g => `
+      tbody.innerHTML = galleryCache.length ? galleryCache.map(g => `
         <tr>
           <td>
             <div class="row-title">${Fikrah.escapeHTML(g.caption || "")}</div>
@@ -295,11 +312,11 @@
       `).join("") : `<tr class="admin-empty-row"><td colspan="4">No images yet.</td></tr>`;
     }
 
-    function renderVideos() {
+    async function renderVideos() {
       const tbody = document.getElementById("videosTable");
-      const items = CMS.getVideos();
+      videosCache = await CMS.getVideos();
 
-      tbody.innerHTML = items.length ? items.map(v => `
+      tbody.innerHTML = videosCache.length ? videosCache.map(v => `
         <tr>
           <td><div class="row-title">${Fikrah.escapeHTML(v.title || "")}</div></td>
           <td>${Fikrah.escapeHTML(v.category || "")}</td>
@@ -314,17 +331,19 @@
       `).join("") : `<tr class="admin-empty-row"><td colspan="4">No videos yet.</td></tr>`;
     }
 
-    function renderAll() {
-      renderPosts();
-      renderGallery();
-      renderVideos();
+    async function renderAll() {
+      await Promise.all([renderPosts(), renderGallery(), renderVideos()]);
     }
 
-    document.addEventListener("click", event => {
+    document.addEventListener("click", async event => {
 
       const editBtn = event.target.closest("[data-edit]");
       if (editBtn) {
-        openModal(editBtn.dataset.edit, editBtn.dataset.id);
+        const type = editBtn.dataset.edit;
+        const id = editBtn.dataset.id;
+        const cache = { post: postsCache, gallery: galleryCache, video: videosCache }[type];
+        const record = cache.find(item => item.id === id);
+        openModal(type, id, record);
         return;
       }
 
@@ -337,67 +356,16 @@
           return;
         }
 
-        if (type === "post") CMS.deletePost(id);
-        if (type === "gallery") CMS.deleteImage(id);
-        if (type === "video") CMS.deleteVideo(id);
-
-        renderAll();
+        try {
+          if (type === "post") await CMS.deletePost(id);
+          if (type === "gallery") await CMS.deleteImage(id);
+          if (type === "video") await CMS.deleteVideo(id);
+          await renderAll();
+        } catch (err) {
+          alert("Couldn't delete this: " + err.message);
+        }
       }
     });
-
-    /* -----------------------------------------------------
-       EXPORT / IMPORT / RESET
-       ----------------------------------------------------- */
-
-    const exportBtn = document.getElementById("exportBtn");
-    const importBtn = document.getElementById("importBtn");
-    const importInput = document.getElementById("importInput");
-    const resetBtn = document.getElementById("resetBtn");
-
-    if (exportBtn) {
-      exportBtn.addEventListener("click", () => {
-        const blob = new Blob([CMS.exportAll()], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "fikrah-content-export.json";
-        a.click();
-        URL.revokeObjectURL(url);
-      });
-    }
-
-    if (importBtn && importInput) {
-      importBtn.addEventListener("click", () => importInput.click());
-
-      importInput.addEventListener("change", () => {
-        const file = importInput.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-
-        reader.onload = () => {
-          try {
-            CMS.importAll(reader.result);
-            renderAll();
-            Fikrah.showToastIfPresent("Content imported.");
-          } catch (err) {
-            alert("That file doesn't look like a valid Fikrah content export.");
-          }
-        };
-
-        reader.readAsText(file);
-        importInput.value = "";
-      });
-    }
-
-    if (resetBtn) {
-      resetBtn.addEventListener("click", () => {
-        if (confirm("Reset all content in this browser back to the site defaults? This can't be undone.")) {
-          CMS.resetAll();
-          renderAll();
-        }
-      });
-    }
 
   });
 

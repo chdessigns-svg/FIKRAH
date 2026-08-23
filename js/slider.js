@@ -6,7 +6,7 @@
    separate to manage.
    ========================================================= */
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
 
   const mount = document.getElementById("fikrahSlider");
 
@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  const posts = CMS.getFeaturedPosts(5);
+  const posts = await CMS.getFeaturedPosts(5);
 
   if (!posts.length) {
     mount.innerHTML = '<div class="slider-empty">No posts yet — add one from the content manager and it will appear here.</div>';
