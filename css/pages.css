@@ -424,10 +424,22 @@
   height: 470px;
   border-radius: var(--radius-xl);
   overflow: hidden;
-  background:
+  background-image:
     linear-gradient(145deg, rgba(201, 21, 43, 0.85), rgba(60, 3, 10, 0.85)),
     repeating-linear-gradient(45deg, #c9152b, #c9152b 10px, #a30f23 10px, #a30f23 20px);
+  background-size: cover;
+  background-position: center;
   box-shadow: var(--shadow-lg);
+}
+
+.about-image.has-photo {
+  background-image:
+    linear-gradient(180deg, rgba(20, 3, 6, 0) 45%, rgba(20, 3, 6, 0.85) 100%),
+    url("/assets/images/gallery/WhatsApp Image 2026-08-29 at 14.59.26.jpeg");
+}
+
+.about-image.has-photo::before {
+  display: none;
 }
 
 .about-image::before {
