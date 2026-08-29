@@ -285,7 +285,7 @@
   .gallery-grid,
   .gallery-grid.gallery-grid-full {
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 180px 180px 180px;
+    grid-auto-rows: 180px;
   }
 
   .gallery-grid:not(.gallery-grid-full) .gallery-item:first-child {

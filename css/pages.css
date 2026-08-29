@@ -1230,7 +1230,7 @@
 
 .gallery-grid.gallery-grid-full {
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 230px);
+  grid-auto-rows: 230px;
 }
 
 .gallery-item {
