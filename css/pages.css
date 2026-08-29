@@ -1240,10 +1240,9 @@
   background:
     linear-gradient(145deg, rgba(201, 21, 43, 0.75), rgba(45, 4, 9, 0.85)),
     repeating-linear-gradient(45deg, #d52b3f 0, #d52b3f 12px, #9d0d20 12px, #9d0d20 24px);
-  background-size: contain;
+  background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-  background-color: #141416;
 }
 
 .gallery-grid:not(.gallery-grid-full) .gallery-item:first-child {
